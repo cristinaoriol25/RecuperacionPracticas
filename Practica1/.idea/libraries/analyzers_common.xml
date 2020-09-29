@@ -1,0 +1,40 @@
+<component name="libraryTable">
+  <library name="analyzers-common">
+    <CLASSES />
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-common" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-icu" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-kuromoji" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-morfologik" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-nori" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-opennlp" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-phonetic" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-smartcn" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/analyzers-stempel" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/backward-codecs" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/benchmark" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/classification" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/codecs" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/core" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/demo" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/expressions" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/facet" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/grouping" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/highlighter" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/join" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/luke" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/memory" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/misc" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/monitor" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/queries" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/queryparser" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/replicator" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/sandbox" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/spatial-extras" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/spatial3d" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/suggest" />
+      <root url="file://$PROJECT_DIR$/../lucene-8.6.2/docs/test-framework" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
