@@ -179,6 +179,7 @@ public class IndexFiles {
           // For example the long value 2011021714 would mean
           // February 17, 2011, 2-3 PM.
           doc.add(new StoredField("modified", file.lastModified()));
+          System.out.println(file.lastModified());
 
           // Add the contents of the file to a field named "contents".  Specify a Reader,
           // so that the text of the file is tokenized and indexed, but not stored.
