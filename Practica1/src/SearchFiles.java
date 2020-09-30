@@ -19,12 +19,15 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -154,7 +157,7 @@ public class SearchFiles {
 
     int start = 0;
     int end = Math.min(numTotalHits, hitsPerPage);
-        
+
     while (true) {
       if (end > hits.length) {
         System.out.println("Only results 1 - " + hits.length +" of " + numTotalHits + " total matching documents collected.");
@@ -170,6 +173,7 @@ public class SearchFiles {
       end = Math.min(hits.length, start + hitsPerPage);
       
       for (int i = start; i < end; i++) {
+        System.out.println(searcher.explain(query, hits[i].doc));
         if (raw) {                              // output raw format
           System.out.println("doc="+hits[i].doc+" score="+hits[i].score);
           continue;
@@ -181,6 +185,10 @@ public class SearchFiles {
           System.out.println((i+1) + ". " + path);
         } else {
           System.out.println((i+1) + ". " + "No path for this document");
+        }
+        if (!raw){
+          Date currentDate = new Date(Long.parseLong(doc.get("modified")));
+          System.out.println(currentDate);
         }
                   
       }
