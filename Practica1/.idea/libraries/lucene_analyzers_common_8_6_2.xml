@@ -4,6 +4,8 @@
       <root url="jar://$PROJECT_DIR$/../lucene-8.6.2/analysis/common/lucene-analyzers-common-8.6.2.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ideaLibSources/lucene-analyzers-common-8.6.2-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
