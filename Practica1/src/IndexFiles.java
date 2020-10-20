@@ -45,7 +45,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-
+//import SpanishAnalyzer2;
 
 /** Index all text files under a directory.
  * <p>
@@ -96,7 +96,7 @@ public class IndexFiles {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(Paths.get(indexPath));
-      Analyzer analyzer = new SpanishAnalyzer();
+      Analyzer analyzer = new SpanishAnalyzer2();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
       if (create) {
@@ -216,7 +216,7 @@ public class IndexFiles {
 
           //List<String> listaTexto=new ArrayList<String>();
           List<String> listaTexto = Arrays.asList("title", "subject", "description", "creator", "publisher");
-          List<String> listaString = Arrays.asList("identifier", "type", "format", "languaje");
+          List<String> listaString = Arrays.asList("identifier", "type", "format", "language");
 
           for(String nom:listaTexto) {
 
@@ -246,6 +246,26 @@ public class IndexFiles {
                 //Element eElement = (Element) nNode;
                 String s = datoContenido.getNodeValue();
                 doc.add(new StringField(nom, s, Field.Store.YES));
+                System.out.println("");
+              }
+
+            }
+          }
+          NodeList nList = documento.getElementsByTagName("ows:BoundingBox");
+          if (nList.getLength() != 0){
+            NodeList nNodes = nList.item(0).getChildNodes();
+            for (int temp = 0; temp < nNodes.getLength(); temp++) {
+              Node nNode = nNodes.item(temp);
+              Node datoContenido = nNode.getFirstChild();
+              if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                //Element eElement = (Element) nNode;
+                String [] coords = datoContenido.getNodeValue().split(" ");
+                String primero = "east", segundo = "north";
+                if (nNode.getNodeName()=="ows:LowerCorner") { // LowerCorner da el oeste y el sur
+                  primero = "west"; segundo = "south";
+                }
+                doc.add(new DoublePoint(primero, Double.parseDouble(coords[0])));
+                doc.add(new DoublePoint(segundo, Double.parseDouble(coords[1])));
               }
 
             }

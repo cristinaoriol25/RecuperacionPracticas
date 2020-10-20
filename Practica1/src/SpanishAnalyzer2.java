@@ -3,35 +3,8 @@
 // (powered by FernFlower decompiler)
 //
 
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.es.SpanishAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.*;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+//package org.apache.lucene.analysis.es;
 
-import javax.lang.model.element.Element;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.lucene.analysis.CharArraySet;
@@ -71,14 +44,13 @@ public final class SpanishAnalyzer2 extends StopwordAnalyzerBase {
     protected TokenStreamComponents createComponents(String fieldName) {
         Tokenizer source = new StandardTokenizer();
         TokenStream result = new LowerCaseFilter(source);
-        TokenStream result = new StopFilter(result, this.stopwords);
+        result = new StopFilter(result, this.stopwords);
         if (!this.stemExclusionSet.isEmpty()) {
             result = new SetKeywordMarkerFilter((TokenStream)result, this.stemExclusionSet);
         }
-        SnowballFilter sn= new SnowballFilter(Spanish);
 
-        //TokenStream result = new SpanishLightStemFilter((TokenStream)result);
-        return new TokenStreamComponents(source, sn);
+        result = new SnowballFilter((TokenStream) result, "Spanish");
+        return new TokenStreamComponents(source, result);
     }
 
     protected TokenStream normalize(String fieldName, TokenStream in) {
@@ -100,3 +72,4 @@ public final class SpanishAnalyzer2 extends StopwordAnalyzerBase {
         }
     }
 }
+

@@ -36,6 +36,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.ClassicSimilarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 
 /** Simple command-line based search demo. */
@@ -90,7 +92,9 @@ public class SearchFiles {
     
     IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
     IndexSearcher searcher = new IndexSearcher(reader);
-    Analyzer analyzer = new SpanishAnalyzer();
+    searcher.setSimilarity(new ClassicSimilarity());
+
+    Analyzer analyzer = new SpanishAnalyzer2();
 
     BufferedReader in = null;
     if (queries != null) {
@@ -236,6 +240,7 @@ public class SearchFiles {
         if (quit) break;
         end = Math.min(numTotalHits, start + hitsPerPage);
       }
+
     }
   }
 }
