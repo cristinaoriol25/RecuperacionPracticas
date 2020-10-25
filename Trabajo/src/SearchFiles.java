@@ -56,6 +56,8 @@ public class SearchFiles {
 
     String index = "index";
     String field = "contents";
+    String infoNeeds = "information-needs"; // por ej
+    String output = "output.txt"; // por ej
     String queries = null;
     int repeat = 0;
     boolean raw = false;
@@ -67,7 +69,13 @@ public class SearchFiles {
         index = args[i+1];
         i++;
       } else if ("-field".equals(args[i])) {
-        field = args[i+1];
+        field = args[i + 1];
+        i++;
+      } else if ("-infoNeeds".equals(args[i])) {
+        infoNeeds = args[i+1];
+        i++;
+      } else if ("-output".equals(args[i])) {
+        output = args[i+1];
         i++;
       } else if ("-queries".equals(args[i])) {
         queries = args[i+1];
@@ -195,7 +203,6 @@ public class SearchFiles {
           Date currentDate = new Date(Long.parseLong(doc.get("modified")));
           System.out.println(currentDate);
         }
-                  
       }
 
       if (!interactive || end == 0) {

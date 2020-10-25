@@ -48,7 +48,6 @@ public final class SpanishAnalyzer2 extends StopwordAnalyzerBase {
         if (!this.stemExclusionSet.isEmpty()) {
             result = new SetKeywordMarkerFilter((TokenStream)result, this.stemExclusionSet);
         }
-
         result = new SnowballFilter((TokenStream) result, "Spanish");
         return new TokenStreamComponents(source, result);
     }

@@ -187,19 +187,6 @@ public class IndexFiles {
           Field pathField = new StringField("path", file.getPath(), Field.Store.YES);
           doc.add(pathField);
 
-          // Add the last modified date of the file a field named "modified".
-          // Use a StoredField to return later its value as a response to a query.
-          // This indexes to milli-second resolution, which
-          // is often too fine.  You could instead create a number based on
-          // year/month/day/hour/minutes/seconds, down the resolution you require.
-          // For example the long value 2011021714 would mean
-          // February 17, 2011, 2-3 PM.
-
-          doc.add(new StoredField("modified", file.lastModified()));
-
-
-          System.out.println(file.lastModified());
-
           // Add the contents of the file to a field named "contents".  Specify a Reader,
           // so that the text of the file is tokenized and indexed, but not stored.
           // Note that FileReader expects the file to be in UTF-8 encoding.
@@ -207,16 +194,16 @@ public class IndexFiles {
           // doc.add(new TextField("contents", new BufferedReader(new InputStreamReader(fis, "UTF-8"))));
 
 
-          DocumentBuilderFactory creadroDoc = DocumentBuilderFactory.newInstance();
-          DocumentBuilder docB = creadroDoc.newDocumentBuilder();
+          DocumentBuilderFactory creadorDoc = DocumentBuilderFactory.newInstance();
+          DocumentBuilder docB = creadorDoc.newDocumentBuilder();
           org.w3c.dom.Document documento = docB.parse(fis);
           //Obtener el elemento raíz del documento
           // Element raiz = (Element) ((org.w3c.dom.Document) documento).getDocumentElement();
           documento.getDocumentElement().normalize();
 
           //List<String> listaTexto=new ArrayList<String>();
-          List<String> listaTexto = Arrays.asList("title", "subject", "description", "creator", "publisher");
-          List<String> listaString = Arrays.asList("identifier", "type", "format", "language");
+          List<String> listaTexto = Arrays.asList("title", "contributor", "subject", "description", "creator", "publisher");
+          List<String> listaString = Arrays.asList("identifier", "type", "date", "format", "language");
 
           for(String nom:listaTexto) {
 
@@ -231,7 +218,6 @@ public class IndexFiles {
                 String s = datoContenido.getNodeValue();
                 doc.add(new TextField(nom, s, Field.Store.YES));
               }
-
             }
           }
           for(String nom:listaString){
@@ -248,42 +234,19 @@ public class IndexFiles {
                 doc.add(new StringField(nom, s, Field.Store.YES));
                 System.out.println("");
               }
-
             }
           }
-          NodeList nList = documento.getElementsByTagName("ows:BoundingBox");
-          if (nList.getLength() != 0){
-            NodeList nNodes = nList.item(0).getChildNodes();
-            for (int temp = 0; temp < nNodes.getLength(); temp++) {
-              Node nNode = nNodes.item(temp);
-              Node datoContenido = nNode.getFirstChild();
-              if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                //Element eElement = (Element) nNode;
-                String [] coords = datoContenido.getNodeValue().split(" ");
-                String primero = "east", segundo = "north";
-                if (nNode.getNodeName()=="ows:LowerCorner") { // LowerCorner da el oeste y el sur
-                  primero = "west"; segundo = "south";
-                }
-                doc.add(new DoublePoint(primero, Double.parseDouble(coords[0])));
-                doc.add(new DoublePoint(segundo, Double.parseDouble(coords[1])));
-              }
-
-            }
+          if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
+            // New index, so we just add the document (no old document can be there):
+            System.out.println("adding " + file);
+            writer.addDocument(doc);
+          } else {
+            // Existing index (an old copy of this document may have been indexed) so
+            // we use updateDocument instead to replace the old one matching the exact
+            // path, if present:
+            System.out.println("updating " + file);
+            writer.updateDocument(new Term("path", file.getPath()), doc);
           }
-
-            if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
-              // New index, so we just add the document (no old document can be there):
-              System.out.println("adding " + file);
-              writer.addDocument(doc);
-            } else {
-              // Existing index (an old copy of this document may have been indexed) so
-              // we use updateDocument instead to replace the old one matching the exact
-              // path, if present:
-              System.out.println("updating " + file);
-              writer.updateDocument(new Term("path", file.getPath()), doc);
-            }
-
-
         } catch (ParserConfigurationException e) {
           e.printStackTrace();
         } catch (SAXException e) {
