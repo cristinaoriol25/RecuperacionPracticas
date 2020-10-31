@@ -232,13 +232,13 @@ public class IndexFiles {
                 //Element eElement = (Element) nNode;
                 String s = datoContenido.getNodeValue();
                 doc.add(new StringField(nom, s, Field.Store.YES));
-                System.out.println("");
+                //System.out.println("");
               }
             }
           }
           if (writer.getConfig().getOpenMode() == OpenMode.CREATE) {
             // New index, so we just add the document (no old document can be there):
-            System.out.println("adding " + file);
+            //System.out.println("adding " + file);
             writer.addDocument(doc);
           } else {
             // Existing index (an old copy of this document may have been indexed) so
