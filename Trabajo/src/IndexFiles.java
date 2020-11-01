@@ -187,6 +187,9 @@ public class IndexFiles {
           Field pathField = new StringField("path", file.getPath(), Field.Store.YES);
           doc.add(pathField);
 
+          Field nameField = new StringField("name", file.getName(), Field.Store.YES);
+          doc.add(nameField);
+
           // Add the contents of the file to a field named "contents".  Specify a Reader,
           // so that the text of the file is tokenized and indexed, but not stored.
           // Note that FileReader expects the file to be in UTF-8 encoding.

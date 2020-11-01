@@ -16,28 +16,23 @@
  */
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileTime;
 import java.util.*;
 
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.tokenize.TokenizerME;
+import opennlp.tools.tokenize.TokenizerModel;
+import opennlp.tools.util.Span;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.es.SpanishAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StoredField;
-import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
-import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -50,6 +45,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /** Simple command-line based search demo. */
 public class SearchFiles {
 
+  static boolean verbose = false;
   private SearchFiles() {
   }
 
@@ -77,6 +73,9 @@ public class SearchFiles {
     for (int i = 0; i < args.length; i++) {
       if ("-index".equals(args[i])) {
         index = args[i + 1];
+        i++;
+      } else if ("-v".equals(args[i])) {
+        verbose = true;
         i++;
       } else if ("-field".equals(args[i])) {
         field = args[i + 1];
@@ -110,75 +109,33 @@ public class SearchFiles {
 
     File infoNeedsFileFile = new File(infoNeedsFile);
     List<Map<String, String>> infoNeeds = parseNeeds(infoNeedsFileFile);
-
-
-    File outputFile = new File(output);
+    // Resetear fichero...
+    FileWriter myWriter = new FileWriter(output);
+    myWriter.close();
     for (var need : infoNeeds) {
-      //System.out.println("------------");
-      //System.out.println(need.toString());
-      TopDocs docsNeed = buscarMatch(index, need.get("text"));
-      outputDocs(outputFile, need.get("identifier"), docsNeed); // saca los docs de un need
-      // TODO: enseñar lo que sacamos o algo no? xdd
-
+      System.out.println("------------");
+      System.out.println(need.toString());
+      List<String> docsNeed = buscarMatch(index, need.get("text"));
+      outputDocs(output, need.get("identifier"), docsNeed); // saca los docs de un need
     }
-    System.exit(0); // TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-    IndexReader reader = DirectoryReader.open(FSDirectory.open(Paths.get(index)));
-    IndexSearcher searcher = new IndexSearcher(reader);
-    searcher.setSimilarity(new ClassicSimilarity());
-
-    Analyzer analyzer = new SpanishAnalyzer2();
-
-    BufferedReader in = null;
-    if (queries != null) {
-      in = new BufferedReader(new InputStreamReader(new FileInputStream(queries), "UTF-8"));
-    } else {
-      in = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
-    }
-    QueryParser parser = new QueryParser(field, analyzer);
-    while (true) {
-      if (queries == null && queryString == null) {                        // prompt the user
-        System.out.println("Enter query: ");
-      }
-
-      String line = queryString != null ? queryString : in.readLine();
-
-      if (line == null || line.length() == -1) {
-        break;
-      }
-
-      line = line.trim();
-      if (line.length() == 0) {
-        break;
-      }
-
-      Query query = parser.parse(line);
-      System.out.println("Searching for: " + query.toString(field));
-
-      if (repeat > 0) {                           // repeat & time as benchmark
-        Date start = new Date();
-        for (int i = 0; i < repeat; i++) {
-          searcher.search(query, 100);
-        }
-        Date end = new Date();
-        System.out.println("Time: " + (end.getTime() - start.getTime()) + "ms");
-      }
-
-      doPagingSearch(in, searcher, query, hitsPerPage, raw, queries == null && queryString == null);
-
-      if (queryString != null) {
-        break;
-      }
-    }
-    reader.close();
   }
 
-  private static void outputDocs(File outputFile, String identifier, TopDocs docsNeed) {
-    // TODO
+  private static void outputDocs(String outputFileS, String identifier, List<String> docsNeed) {
+    try {
+      FileWriter myWriter = new FileWriter(outputFileS, true); // true para append
+      for (var doc : docsNeed) {
+        myWriter.write(identifier + "\t" + doc + "\n");
+      }
+      myWriter.close();
+    } catch (IOException e) {
+      System.out.println("Error de escritura!");
+      e.printStackTrace();
+    }
   }
+
 
   // Devuelve la lista ordenada de documentos por sus puntuaciones
-  private static TopDocs buscarMatch(String index, String textNeed) {
+  private static List<String> buscarMatch(String index, String textNeed) throws IOException {
 
     IndexReader reader = null;
     try {
@@ -189,23 +146,104 @@ public class SearchFiles {
     IndexSearcher searcher = new IndexSearcher(reader);
 
     Analyzer analyzer = new SpanishAnalyzer2();
-    String field = "title"; // ????????
-    QueryParser parser = new QueryParser(field, analyzer);
-    Query query = null;
-    try {
+
+    List<String> camposGenerales = Arrays.asList("title", "description", "subject");
+    BooleanQuery.Builder builder = construirConsultaGeneral(camposGenerales, textNeed, analyzer);
+
+    List<String> camposNombres = Arrays.asList("contributor", "creator");
+    builder = construirConsultaNombresPropios(builder, camposNombres, textNeed, analyzer);
+
+
+    BooleanQuery booleanQuery = builder.build();
+
+
+    //QueryParser parser = new QueryParser(field, analyzer);
+    //Query query = null;
+
+    /*try {
       query = parser.parse(textNeed);
     } catch (ParseException e) {
       e.printStackTrace();
-    }
-    System.out.println("Searching for: " + query.toString(field));
+    }*/
+    System.out.println("Searching for: " + booleanQuery.toString());
     TopDocs resultados = null;
     try {
-      resultados = searcher.search(query, 100); // TODO: revisar para que sean todos
+      resultados = searcher.search(booleanQuery, 100); // TODO: revisar para que sean todos
     } catch (IOException e) {
       e.printStackTrace();
     }
-    return resultados;
+    ScoreDoc[] hits = resultados.scoreDocs;
+    System.out.println("topScores... " );
+    List<String> nombresHits = new ArrayList<String>();
+    for (var hit : hits) {
+      //System.out.println(hit.toString());
+      String nombre = searcher.doc(hit.doc).get("name");
+      nombresHits.add(nombre);
+      try {
+        if (verbose) {
+          System.out.println(nombre);
+          System.out.println(searcher.explain(booleanQuery, hit.doc));
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
 
+    return nombresHits;
+
+  }
+
+  // TODO: revisar que no pete por parametro builder
+  // Fuente: https://www.tutorialspoint.com/opennlp/opennlp_named_entity_recognition.htm
+  private static BooleanQuery.Builder construirConsultaNombresPropios(BooleanQuery.Builder builder, List<String> camposNombres, String textNeed, Analyzer analyzer) {
+    InputStream inputStreamTokenizer = null;
+
+    System.out.println("Buscando nombres en need: " + textNeed);
+    try {
+      inputStreamTokenizer = new FileInputStream("en-token.bin"); // Cargar el "tokenizador" (ingles, no hemos encontrado es)
+      TokenizerModel tokenModel = new TokenizerModel(inputStreamTokenizer);
+      //Instantiating the TokenizerME class
+      TokenizerME tokenizer = new TokenizerME(tokenModel);
+      String tokensNeed[] = tokenizer.tokenize(textNeed); // convertir el need en tokens
+      /*for (String token : tokensNeed) {
+        System.out.println(token);
+      }*/
+      // Cargar el modelo de NameFinder:
+      InputStream modelIn = new FileInputStream("es-ner-person.bin"); // español
+      TokenNameFinderModel model = new TokenNameFinderModel(modelIn);
+      NameFinderME nameFinder = new NameFinderME(model);
+      Span nombresSpans[] = nameFinder.find(tokensNeed);
+      for(Span s: nombresSpans) { // TODO: por que co&%$$%& encuentra Biologia como nombre y no Javier??
+        System.out.println(s.toString() + "  " + tokensNeed[s.getStart()]);
+        for (var campo: camposNombres) { // se busca en cada campo
+          Query query = new TermQuery(new Term(campo, tokensNeed[s.getStart()]));
+          builder.add(query, BooleanClause.Occur.SHOULD); // TODO: MUST, supongo. Revisar cuando funcione
+        }
+      }
+      nameFinder.clearAdaptiveData();
+
+    } catch (FileNotFoundException fileNotFoundException) {
+      fileNotFoundException.printStackTrace();
+    } catch (IOException ioException) {
+      ioException.printStackTrace();
+    }
+    return builder;
+  }
+
+  private static BooleanQuery.Builder construirConsultaGeneral(List<String> fields, String textNeed, Analyzer analyzer) {
+    BooleanQuery.Builder builder = new BooleanQuery.Builder();
+    for (var field : fields) {
+      QueryParser parser = new QueryParser(field, analyzer);
+      // Query query = new TermQuery(new Term(field, "eto que e"));
+      Query query = null;
+      try {
+        query = parser.parse(textNeed);
+      } catch (ParseException e) {
+        e.printStackTrace();
+      }
+      builder.add(query, BooleanClause.Occur.SHOULD);
+    }
+    return builder;
   }
 
   /**
