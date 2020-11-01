@@ -151,7 +151,9 @@ public class SearchFiles {
     BooleanQuery.Builder builder = construirConsultaGeneral(camposGenerales, textNeed, analyzer);
 
     List<String> camposNombres = Arrays.asList("contributor", "creator");
+
     builder = construirConsultaNombresPropios(builder, camposNombres, textNeed, analyzer);
+    construirConsultaNombresPropios(builder, camposNombres, "Pepe María es José, Cristina y Mike", analyzer);
 
 
     BooleanQuery booleanQuery = builder.build();
