@@ -18,6 +18,8 @@
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
@@ -112,11 +114,30 @@ public class SearchFiles {
     // Resetear fichero...
     FileWriter myWriter = new FileWriter(output);
     myWriter.close();
-    for (var need : infoNeeds) {
-      System.out.println("------------");
-      System.out.println(need.toString());
-      List<String> docsNeed = buscarMatch(index, need.get("text"));
-      outputDocs(output, need.get("identifier"), docsNeed); // saca los docs de un need
+    // Modelos de tokenizers, NER de OpenNLP:
+    try {
+      InputStream inputStreamTokenizer = null;
+      inputStreamTokenizer = new FileInputStream("en-token.bin"); // Cargar el "tokenizador" (ingles, no hemos encontrado es)
+      TokenizerModel tokenModel = new TokenizerModel(inputStreamTokenizer);
+      //Instantiating the TokenizerME class
+      TokenizerME tokenizer = new TokenizerME(tokenModel);
+      //      for (String token : tokensNeed) {
+      //        System.out.println(token);
+      //      }
+      // Cargar el modelo de NameFinder:
+      InputStream modelIn = new FileInputStream("en-ner-person.bin"); // español
+      TokenNameFinderModel model = new TokenNameFinderModel(modelIn);
+      NameFinderME nameFinder = new NameFinderME(model);
+      for (var need : infoNeeds) {
+        System.out.println("------------");
+        System.out.println(need.toString());
+        List<String> docsNeed = buscarMatch(index, tokenizer, nameFinder, need.get("text"));
+        outputDocs(output, need.get("identifier"), docsNeed); // saca los docs de un need
+      }
+    } catch (FileNotFoundException fileNotFoundException) {
+      fileNotFoundException.printStackTrace();
+    } catch (IOException ioException) {
+      ioException.printStackTrace();
     }
   }
 
@@ -135,7 +156,7 @@ public class SearchFiles {
 
 
   // Devuelve la lista ordenada de documentos por sus puntuaciones
-  private static List<String> buscarMatch(String index, String textNeed) throws IOException {
+  private static List<String> buscarMatch(String index, TokenizerME tokenizer, NameFinderME nameFinder, String textNeed) throws IOException {
 
     IndexReader reader = null;
     try {
@@ -152,11 +173,14 @@ public class SearchFiles {
 
     List<String> camposNombres = Arrays.asList("contributor", "creator");
 
-    builder = construirConsultaNombresPropios(builder, camposNombres, textNeed, analyzer);
-    construirConsultaNombresPropios(builder, camposNombres, "Pepe María es José, Cristina y Mike", analyzer);
-    builder = construirConsultasEspecificas(builder, textNeed, analyzer);
+    String[] tokensNeed = tokenizer.tokenize(textNeed);
+    builder = construirConsultaNombresPropios(builder, nameFinder, camposNombres, tokensNeed, analyzer);
 
 
+    String[] otrosTokens = tokenizer.tokenize("Pepe María es José, Cristina y Mike");
+    construirConsultaNombresPropios(builder, nameFinder, camposNombres, otrosTokens, analyzer);
+
+    construirConsultaTemporal(builder, camposGenerales, tokensNeed, analyzer);
 
     BooleanQuery booleanQuery = builder.build();
 
@@ -202,39 +226,25 @@ public class SearchFiles {
   }
 
   // TODO: revisar que no pete por parametro builder
+  // TODO: mover fuera del bucle de los needs en el main la inicializacion de los modelos y pasarle el namefinder como param
   // Fuente: https://www.tutorialspoint.com/opennlp/opennlp_named_entity_recognition.htm
-  private static BooleanQuery.Builder construirConsultaNombresPropios(BooleanQuery.Builder builder, List<String> camposNombres, String textNeed, Analyzer analyzer) {
-    InputStream inputStreamTokenizer = null;
-
-    System.out.println("Buscando nombres en need: " + textNeed);
-    try {
-      inputStreamTokenizer = new FileInputStream("en-token.bin"); // Cargar el "tokenizador" (ingles, no hemos encontrado es)
-      TokenizerModel tokenModel = new TokenizerModel(inputStreamTokenizer);
-      //Instantiating the TokenizerME class
-      TokenizerME tokenizer = new TokenizerME(tokenModel);
-      String tokensNeed[] = tokenizer.tokenize(textNeed); // convertir el need en tokens
-      /*for (String token : tokensNeed) {
-        System.out.println(token);
-      }*/
-      // Cargar el modelo de NameFinder:
-      InputStream modelIn = new FileInputStream("es-ner-person.bin"); // español
-      TokenNameFinderModel model = new TokenNameFinderModel(modelIn);
-      NameFinderME nameFinder = new NameFinderME(model);
-      Span nombresSpans[] = nameFinder.find(tokensNeed);
-      for(Span s: nombresSpans) { // TODO: por que co&%$$%& encuentra Biologia como nombre y no Javier??
-        System.out.println(s.toString() + "  " + tokensNeed[s.getStart()]);
-        for (var campo: camposNombres) { // se busca en cada campo
-          Query query = new TermQuery(new Term(campo, tokensNeed[s.getStart()]));
-          builder.add(query, BooleanClause.Occur.SHOULD); // TODO: MUST, supongo. Revisar cuando funcione
-        }
+  private static BooleanQuery.Builder construirConsultaNombresPropios(BooleanQuery.Builder builder, NameFinderME nameFinder, List<String> camposNombres, String[] tokensNeed, Analyzer analyzer) {
+    System.out.println("Buscando nombres en need: " + tokensNeed);
+    Span nombresSpans[] = nameFinder.find(tokensNeed);
+    for(Span s: nombresSpans) { // TODO: por que co&%$$%& encuentra Biologia como nombre y no Javier??
+      //System.out.println(s.toString() + "  " + tokensNeed[s.getStart()]);
+      String nombre = ""; // almacenara el nombre completo (+apellidos)
+      for (int i = s.getStart(); i<s.getEnd(); i++) { // cada span puede tener varios tokens (ej: "Mariano Rajoy" es un solo span)
+        System.out.println(s.toString() + "  " + tokensNeed[i]);
+        nombre += tokensNeed[i] + ((i<s.getEnd()-1) ? " " : "");// token + espacio (si no es el ultimo nombre)
       }
-      nameFinder.clearAdaptiveData();
-
-    } catch (FileNotFoundException fileNotFoundException) {
-      fileNotFoundException.printStackTrace();
-    } catch (IOException ioException) {
-      ioException.printStackTrace();
+      for (var campo: camposNombres) { // se busca en cada campo
+        Query query = new TermQuery(new Term(campo, nombre));
+        builder.add(query, BooleanClause.Occur.SHOULD); // TODO: MUST, supongo. Revisar cuando funcione
+      }
     }
+    nameFinder.clearAdaptiveData();
+
     return builder;
   }
 
@@ -253,6 +263,37 @@ public class SearchFiles {
     }
     return builder;
   }
+
+  private static int comprobarSiglo(String siglo) {
+    return -1;
+  }
+
+  // Añade las queries correspondientes a los periodos o años que se quieren buscar
+  private static BooleanQuery.Builder construirConsultaTemporal(BooleanQuery.Builder builder, List<String> fields, String[] tokensNeed, Analyzer analyzer) {
+    Pattern pSiglo = Pattern.compile("a");
+    for (String token : tokensNeed) {
+      Matcher m = pSiglo.matcher(token);
+      // boolean b = m.matches();
+      if (m.matches());
+      {
+        System.out.println("Siglo: " + token);
+      }
+    }
+
+//    for (var field : fields) {
+//      QueryParser parser = new QueryParser(field, analyzer);
+//      // Query query = new TermQuery(new Term(field, "eto que e"));
+//      Query query = null;
+//      try {
+//        query = parser.parse(textNeed);
+//      } catch (ParseException e) {
+//        e.printStackTrace();
+//      }
+//      builder.add(query, BooleanClause.Occur.SHOULD);
+//    }
+    return builder;
+  }
+
 
   /**
    * This demonstrates a typical paging search scenario, where the search engine presents
