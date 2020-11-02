@@ -154,6 +154,8 @@ public class SearchFiles {
 
     builder = construirConsultaNombresPropios(builder, camposNombres, textNeed, analyzer);
     construirConsultaNombresPropios(builder, camposNombres, "Pepe María es José, Cristina y Mike", analyzer);
+    builder = construirConsultasEspecificas(builder, textNeed, analyzer);
+
 
 
     BooleanQuery booleanQuery = builder.build();
@@ -192,6 +194,10 @@ public class SearchFiles {
     }
 
     return nombresHits;
+
+  }
+
+  private static BooleanQuery.Builder construirConsultasEspecificas(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer) {
 
   }
 
