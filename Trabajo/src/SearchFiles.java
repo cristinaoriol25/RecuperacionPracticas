@@ -44,6 +44,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import static java.util.Map.entry;
+
 /** Simple command-line based search demo. */
 public class SearchFiles {
 
@@ -222,7 +224,7 @@ public class SearchFiles {
   }
 
   private static BooleanQuery.Builder construirConsultasEspecificas(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer) {
-
+    return builder;
   }
 
   // TODO: revisar que no pete por parametro builder
@@ -264,19 +266,49 @@ public class SearchFiles {
     return builder;
   }
 
-  private static int comprobarSiglo(String siglo) {
-    return -1;
+  // Si es un siglo, lo devuelve como año (Siglo XX -> 1900).
+  // TODO: Si no, devuelve -1, de momento asumimos que el siglo esta bien...
+  private static int romanoToInt(String siglo) {
+    Map<Character, Integer> valores = Map.ofEntries(
+            entry('M', 1000),
+            entry('D', 500),
+            entry('C', 100),
+            entry('L', 50),
+            entry('X', 10),
+            entry('V', 5),
+            entry('I', 1)
+    );//new HashMap<String, Integer>();
+    int val = 0;
+    int ultimoVal = 0;
+    for (int i = siglo.length()-1; i>=0; i--) {// dcha a izq
+      Character c = siglo.charAt(i);
+      int valI = valores.get(c);
+      if (valI >= ultimoVal) {// si es >= se suma
+        val += valI;
+      }
+      else { // Si no, se resta (ej: IX)
+        val -= valI;
+      }
+      ultimoVal=valI;
+    }
+    return val;
   }
 
   // Añade las queries correspondientes a los periodos o años que se quieren buscar
   private static BooleanQuery.Builder construirConsultaTemporal(BooleanQuery.Builder builder, List<String> fields, String[] tokensNeed, Analyzer analyzer) {
-    Pattern pSiglo = Pattern.compile("a");
+    Pattern pSiglo = Pattern.compile("[MDCLXVI]+");
     for (String token : tokensNeed) {
       Matcher m = pSiglo.matcher(token);
       // boolean b = m.matches();
-      if (m.matches());
+      if (m.matches())
       {
-        System.out.println("Siglo: " + token);
+        System.out.println("Siglo: " + token + " = " + romanoToInt(token));
+        int siglo = romanoToInt(token);
+        for (var campo: fields) { // se busca en cada campo
+          Query query = new TermQuery(new Term(campo, token)); // TODO: buscar rango? indexar fechas que aparecen en los textos??
+          builder.add(query, BooleanClause.Occur.SHOULD); // TODO: MUST, supongo. Revisar cuando funcione
+        }
+        //System.out.println("MMCXLIV = " + romanoToInt("MMCXLIV"));
       }
     }
 
