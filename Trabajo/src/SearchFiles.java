@@ -265,7 +265,30 @@ public class SearchFiles {
     }
     return builder;
   }
-
+  private static BooleanQuery.Builder construirConsultaTipo(List<String> fields, String textNeed, Analyzer analyzer) {
+    BooleanQuery.Builder builder = new BooleanQuery.Builder();
+    if(textNeed.contains("Tesis") || textNeed.contains("tesis") ) {
+      Query query = new TermQuery(new Term("type", "TESIS"));
+      BoostQuery b = new BoostQuery(query, (float) 1.2);
+      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+    }
+    if (textNeed.contains("Trabajo de fin de grado") || textNeed.contains("trabajo de fin de grado") || textNeed.contains("Trabajos académicos") || textNeed.contains("trabajos académicos")) {
+      Query query = new TermQuery(new Term("type", "TAZ-TFG"));
+      BoostQuery b = new BoostQuery(query, (float) 1.2);
+      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+    }
+    if (textNeed.contains("Trabajo de fin de master") || textNeed.contains("trabajo de fin de master")|| textNeed.contains("Trabajos académicos") || textNeed.contains("trabajos académicos")) {
+      Query query = new TermQuery(new Term("type", "TAZ-TFM"));
+      BoostQuery b = new BoostQuery(query, (float) 1.2);
+      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+    }
+    if (textNeed.contains("Proyectos fin de carrera") || textNeed.contains("proyectos fin de carrera")|| textNeed.contains("Trabajos académicos") || textNeed.contains("trabajos académicos")) {
+      Query query = new TermQuery(new Term("type", "TAZ-TFM"));
+      BoostQuery b = new BoostQuery(query, (float) 1.2);
+      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+    }
+    return builder;
+  }
   // Si es un siglo, lo devuelve como año (Siglo XX -> 1900).
   // TODO: Si no, devuelve -1, de momento asumimos que el siglo esta bien...
   private static int romanoToInt(String siglo) {
