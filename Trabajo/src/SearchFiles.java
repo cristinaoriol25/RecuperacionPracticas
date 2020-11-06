@@ -227,8 +227,6 @@ public class SearchFiles {
     return builder;
   }
 
-  // TODO: revisar que no pete por parametro builder
-  // TODO: mover fuera del bucle de los needs en el main la inicializacion de los modelos y pasarle el namefinder como param
   // Fuente: https://www.tutorialspoint.com/opennlp/opennlp_named_entity_recognition.htm
   private static BooleanQuery.Builder construirConsultaNombresPropios(BooleanQuery.Builder builder, NameFinderME nameFinder, List<String> camposNombres, String[] tokensNeed, Analyzer analyzer) {
     System.out.println("Buscando nombres en need: " + tokensNeed);
@@ -250,6 +248,21 @@ public class SearchFiles {
     return builder;
   }
 
+  private static BooleanQuery.Builder construirConsultaLenguaje(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer, float boost) {
+    String needLower = textNeed.toLowerCase();
+    if (needLower.contains("en inglés")) {
+      Query query = new TermQuery(new Term("language", "en"));
+      BoostQuery b = new BoostQuery(query, boost); // peso
+      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+    }
+    if (needLower.contains("en español")) {
+      Query query = new TermQuery(new Term("language", "spa"));
+      BoostQuery b = new BoostQuery(query, boost); // peso
+      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+    }
+    return builder;
+  }
+
   private static BooleanQuery.Builder construirConsultaGeneral(List<String> fields, String textNeed, Analyzer analyzer) {
     BooleanQuery.Builder builder = new BooleanQuery.Builder();
     for (var field : fields) {
@@ -265,6 +278,7 @@ public class SearchFiles {
     }
     return builder;
   }
+
   private static BooleanQuery.Builder construirConsultaTipo(List<String> fields, String textNeed, Analyzer analyzer) {
     BooleanQuery.Builder builder = new BooleanQuery.Builder();
     if(textNeed.contains("Tesis") || textNeed.contains("tesis") ) {
@@ -328,24 +342,17 @@ public class SearchFiles {
         System.out.println("Siglo: " + token + " = " + romanoToInt(token));
         int siglo = romanoToInt(token);
         for (var campo: fields) { // se busca en cada campo
-          Query query = new TermQuery(new Term(campo, token)); // TODO: buscar rango? indexar fechas que aparecen en los textos??
-          builder.add(query, BooleanClause.Occur.SHOULD); // TODO: MUST, supongo. Revisar cuando funcione
+          PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
+          phraseBuilder.add(new Term(campo, "año"), 0); // ej: siglo XX -> año 19..
+          phraseBuilder.add(new Term(campo, token), 1);
+          PhraseQuery pq = phraseBuilder.build();
+          Query query = new TermQuery(new Term(campo, token)); // se busca el siglo tal cual
+          BoostQuery b = new BoostQuery(query, 0.5f);
+          builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
         }
-        //System.out.println("MMCXLIV = " + romanoToInt("MMCXLIV"));
       }
     }
 
-//    for (var field : fields) {
-//      QueryParser parser = new QueryParser(field, analyzer);
-//      // Query query = new TermQuery(new Term(field, "eto que e"));
-//      Query query = null;
-//      try {
-//        query = parser.parse(textNeed);
-//      } catch (ParseException e) {
-//        e.printStackTrace();
-//      }
-//      builder.add(query, BooleanClause.Occur.SHOULD);
-//    }
     return builder;
   }
 
