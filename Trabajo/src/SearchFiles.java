@@ -28,6 +28,7 @@ import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
@@ -36,6 +37,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.BytesRef;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -181,8 +183,10 @@ public class SearchFiles {
 
     String[] otrosTokens = tokenizer.tokenize("Pepe María es José, Cristina y Mike");
     construirConsultaNombresPropios(builder, nameFinder, camposNombres, otrosTokens, analyzer);
+    construirConsultaTipo(builder, textNeed, analyzer);
 
     construirConsultaTemporal(builder, camposGenerales, tokensNeed, analyzer);
+    construirConsultaPublicado(builder, textNeed, analyzer, );
 
     BooleanQuery booleanQuery = builder.build();
 
@@ -223,9 +227,6 @@ public class SearchFiles {
 
   }
 
-  private static BooleanQuery.Builder construirConsultasEspecificas(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer) {
-    return builder;
-  }
 
   // Fuente: https://www.tutorialspoint.com/opennlp/opennlp_named_entity_recognition.htm
   private static BooleanQuery.Builder construirConsultaNombresPropios(BooleanQuery.Builder builder, NameFinderME nameFinder, List<String> camposNombres, String[] tokensNeed, Analyzer analyzer) {
@@ -278,9 +279,7 @@ public class SearchFiles {
     }
     return builder;
   }
-
-  private static BooleanQuery.Builder construirConsultaTipo(List<String> fields, String textNeed, Analyzer analyzer) {
-    BooleanQuery.Builder builder = new BooleanQuery.Builder();
+  private static BooleanQuery.Builder construirConsultaTipo(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer) {
     if(textNeed.contains("Tesis") || textNeed.contains("tesis") ) {
       Query query = new TermQuery(new Term("type", "TESIS"));
       BoostQuery b = new BoostQuery(query, (float) 1.2);
@@ -329,6 +328,30 @@ public class SearchFiles {
       ultimoVal=valI;
     }
     return val;
+  }
+
+  private static BooleanQuery.Builder construirConsultaPublicado(BooleanQuery.Builder builder, String need, Analyzer analyzer, float boost) {
+    Pattern publicacion=Pattern.compile("publicado en [0-9]+");
+    Pattern publicacion1=Pattern.compile("publicado entre [0-9]+ y [0-9]+");
+      need=need.toLowerCase();
+      Matcher m = publicacion.matcher(need);
+      Matcher m1 = publicacion1.matcher(need);
+
+    // boolean b = m.matches();
+      if (m.matches()) {
+        String[] n=need.split(" ");
+        Query query = new TermQuery(new Term("date", n[3]));
+        BoostQuery b = new BoostQuery(query, boost);
+        builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      }else if(m1.matches()){
+        String[] n=need.split(" ");
+        BytesRef n1= new BytesRef(n[3]);
+        BytesRef n2= new BytesRef(n[5]);
+        TermRangeQuery t=new TermRangeQuery("date", n1, n2, true, true);
+        BoostQuery b = new BoostQuery(t, boost);
+        builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      }
+      return builder;
   }
 
   // Añade las queries correspondientes a los periodos o años que se quieren buscar
