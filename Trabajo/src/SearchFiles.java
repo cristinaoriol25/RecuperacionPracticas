@@ -170,7 +170,7 @@ public class SearchFiles {
     }
     IndexSearcher searcher = new IndexSearcher(reader);
 
-    Analyzer analyzer = new SpanishAnalyzer2();
+    Analyzer analyzer = new Nuestroanalyzer();
 
     List<String> camposGenerales = Arrays.asList("title", "description", "subject");
     BooleanQuery.Builder builder = construirConsultaGeneral(camposGenerales, textNeed, analyzer);

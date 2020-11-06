@@ -1,10 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
-//package org.apache.lucene.analysis.es;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.lucene.analysis.CharArraySet;
@@ -19,24 +12,23 @@ import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.util.IOUtils;
-
-public final class SpanishAnalyzer2 extends StopwordAnalyzerBase {
+public class Nuestroanalyzer extends StopwordAnalyzerBase{
     private final CharArraySet stemExclusionSet;
     public static final String DEFAULT_STOPWORD_FILE = "spanish_stop.txt";
 
     public static CharArraySet getDefaultStopSet() {
-        return SpanishAnalyzer2.DefaultSetHolder.DEFAULT_STOP_SET;
+        return Nuestroanalyzer.DefaultSetHolder.DEFAULT_STOP_SET;
     }
 
-    public SpanishAnalyzer2() {
-        this(SpanishAnalyzer2.DefaultSetHolder.DEFAULT_STOP_SET);
+    public Nuestroanalyzer() {
+        this(Nuestroanalyzer.DefaultSetHolder.DEFAULT_STOP_SET);
     }
 
-    public SpanishAnalyzer2(CharArraySet stopwords) {
+    public Nuestroanalyzer(CharArraySet stopwords) {
         this(stopwords, CharArraySet.EMPTY_SET);
     }
 
-    public SpanishAnalyzer2(CharArraySet stopwords, CharArraySet stemExclusionSet) {
+    public Nuestroanalyzer(CharArraySet stopwords, CharArraySet stemExclusionSet) {
         super(stopwords);
         this.stemExclusionSet = CharArraySet.unmodifiableSet(CharArraySet.copy(stemExclusionSet));
     }
@@ -71,5 +63,3 @@ public final class SpanishAnalyzer2 extends StopwordAnalyzerBase {
         }
     }
 }
-
-
