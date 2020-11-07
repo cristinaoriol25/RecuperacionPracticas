@@ -120,7 +120,7 @@ public class SearchFiles {
     myWriter.close();
     // Modelos de tokenizers, NER de OpenNLP:
     try {
-      InputStream inputStreamTokenizer = null;
+      InputStream inputStreamTokenizer;
       inputStreamTokenizer = new FileInputStream("en-token.bin"); // Cargar el "tokenizador" (ingles, no hemos encontrado es)
       TokenizerModel tokenModel = new TokenizerModel(inputStreamTokenizer);
       //Instantiating the TokenizerME class
@@ -173,32 +173,25 @@ public class SearchFiles {
     Analyzer analyzer = new Nuestroanalyzer();
 
     List<String> camposGenerales = Arrays.asList("title", "description", "subject");
-    BooleanQuery.Builder builder = construirConsultaGeneral(camposGenerales, textNeed, analyzer);
-
+    BooleanQuery.Builder builder = construirConsultaGeneral(camposGenerales, textNeed, analyzer, 1f);
+    //BooleanQuery.Builder builder = new BooleanQuery.Builder();
     List<String> camposNombres = Arrays.asList("contributor", "creator");
 
     String[] tokensNeed = tokenizer.tokenize(textNeed);
-    builder = construirConsultaNombresPropios(builder, nameFinder, camposNombres, tokensNeed, analyzer);
+    //builder = construirConsultaNombresPropios(builder, nameFinder, camposNombres, tokensNeed, analyzer);
 
 
     String[] otrosTokens = tokenizer.tokenize("Pepe María es José, Cristina y Mike");
-    construirConsultaNombresPropios(builder, nameFinder, camposNombres, otrosTokens, analyzer);
-    construirConsultaTipo(builder, textNeed, analyzer);
+    // construirConsultaNombresPropios(builder, nameFinder, camposNombres, otrosTokens, analyzer); // No funciona por el es-ner
+    builder = construirConsultaTipo(builder, textNeed, analyzer, 0.7f);
 
-    construirConsultaTemporal(builder, camposGenerales, tokensNeed, analyzer);
-    construirConsultaPublicado(builder, textNeed, analyzer, );
+    builder = construirConsultaLenguaje(builder, textNeed, 10.0f);
+//
+    builder = construirConsultaTemporal(builder, analyzer, camposGenerales, tokensNeed, 1f);
+    builder = construirConsultaPublicado(builder, textNeed, analyzer, 5.0f);
 
     BooleanQuery booleanQuery = builder.build();
 
-
-    //QueryParser parser = new QueryParser(field, analyzer);
-    //Query query = null;
-
-    /*try {
-      query = parser.parse(textNeed);
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }*/
     System.out.println("Searching for: " + booleanQuery.toString());
     TopDocs resultados = null;
     try {
@@ -222,7 +215,6 @@ public class SearchFiles {
         e.printStackTrace();
       }
     }
-
     return nombresHits;
 
   }
@@ -249,22 +241,23 @@ public class SearchFiles {
     return builder;
   }
 
-  private static BooleanQuery.Builder construirConsultaLenguaje(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer, float boost) {
+  private static BooleanQuery.Builder construirConsultaLenguaje(BooleanQuery.Builder builder, String textNeed, float boost) {
     String needLower = textNeed.toLowerCase();
     if (needLower.contains("en inglés")) {
-      Query query = new TermQuery(new Term("language", "en"));
+      //System.out.println("en inglessssssssssssssssssssssssssssssssss");
+      Query query = new TermQuery(new Term("language", "eng"));
       BoostQuery b = new BoostQuery(query, boost); // peso
-      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      builder.add(b, BooleanClause.Occur.SHOULD);
     }
     if (needLower.contains("en español")) {
       Query query = new TermQuery(new Term("language", "spa"));
       BoostQuery b = new BoostQuery(query, boost); // peso
-      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      builder.add(b, BooleanClause.Occur.SHOULD);
     }
     return builder;
   }
 
-  private static BooleanQuery.Builder construirConsultaGeneral(List<String> fields, String textNeed, Analyzer analyzer) {
+  private static BooleanQuery.Builder construirConsultaGeneral(List<String> fields, String textNeed, Analyzer analyzer, float boost) {
     BooleanQuery.Builder builder = new BooleanQuery.Builder();
     for (var field : fields) {
       QueryParser parser = new QueryParser(field, analyzer);
@@ -275,30 +268,31 @@ public class SearchFiles {
       } catch (ParseException e) {
         e.printStackTrace();
       }
-      builder.add(query, BooleanClause.Occur.SHOULD);
+      BoostQuery bq = new BoostQuery(query, boost);
+      builder.add(bq, BooleanClause.Occur.SHOULD);
     }
     return builder;
   }
-  private static BooleanQuery.Builder construirConsultaTipo(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer) {
+  private static BooleanQuery.Builder construirConsultaTipo(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer, float boost) {
     if(textNeed.contains("Tesis") || textNeed.contains("tesis") ) {
       Query query = new TermQuery(new Term("type", "TESIS"));
-      BoostQuery b = new BoostQuery(query, (float) 1.2);
-      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      BoostQuery b = new BoostQuery(query, boost);
+      builder.add(b, BooleanClause.Occur.SHOULD);
     }
     if (textNeed.contains("Trabajo de fin de grado") || textNeed.contains("trabajo de fin de grado") || textNeed.contains("Trabajos académicos") || textNeed.contains("trabajos académicos")) {
       Query query = new TermQuery(new Term("type", "TAZ-TFG"));
-      BoostQuery b = new BoostQuery(query, (float) 1.2);
-      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      BoostQuery b = new BoostQuery(query, boost);
+      builder.add(b, BooleanClause.Occur.SHOULD);
     }
     if (textNeed.contains("Trabajo de fin de master") || textNeed.contains("trabajo de fin de master")|| textNeed.contains("Trabajos académicos") || textNeed.contains("trabajos académicos")) {
       Query query = new TermQuery(new Term("type", "TAZ-TFM"));
-      BoostQuery b = new BoostQuery(query, (float) 1.2);
-      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      BoostQuery b = new BoostQuery(query, boost);
+      builder.add(b, BooleanClause.Occur.SHOULD);
     }
     if (textNeed.contains("Proyectos fin de carrera") || textNeed.contains("proyectos fin de carrera")|| textNeed.contains("Trabajos académicos") || textNeed.contains("trabajos académicos")) {
-      Query query = new TermQuery(new Term("type", "TAZ-TFM"));
-      BoostQuery b = new BoostQuery(query, (float) 1.2);
-      builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+      Query query = new TermQuery(new Term("type", "TAZ-TFC"));
+      BoostQuery b = new BoostQuery(query, boost);
+      builder.add(b, BooleanClause.Occur.SHOULD);
     }
     return builder;
   }
@@ -331,47 +325,54 @@ public class SearchFiles {
   }
 
   private static BooleanQuery.Builder construirConsultaPublicado(BooleanQuery.Builder builder, String need, Analyzer analyzer, float boost) {
-    Pattern publicacion=Pattern.compile("publicado en [0-9]+");
-    Pattern publicacion1=Pattern.compile("publicado entre [0-9]+ y [0-9]+");
+    Pattern publicacion=Pattern.compile(".*publicados? en ([0-9]+).*");
+
+    Pattern publicacion1=Pattern.compile(".*publicados? entre ([0-9]+) y ([0-9]+).*");
       need=need.toLowerCase();
       Matcher m = publicacion.matcher(need);
       Matcher m1 = publicacion1.matcher(need);
-
-    // boolean b = m.matches();
-      if (m.matches()) {
-        String[] n=need.split(" ");
-        Query query = new TermQuery(new Term("date", n[3]));
-        BoostQuery b = new BoostQuery(query, boost);
-        builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
-      }else if(m1.matches()){
-        String[] n=need.split(" ");
-        BytesRef n1= new BytesRef(n[3]);
-        BytesRef n2= new BytesRef(n[5]);
+      if (m1.matches()) {
+        System.out.println("Yep: " + m1.group(1) + "..."+m1.group(2));
+        BytesRef n1= new BytesRef(m1.group(1)); // 1er año
+        BytesRef n2= new BytesRef(m1.group(2)); // 2o
         TermRangeQuery t=new TermRangeQuery("date", n1, n2, true, true);
         BoostQuery b = new BoostQuery(t, boost);
-        builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+        builder.add(b, BooleanClause.Occur.SHOULD);
+      }
+      if (m.matches()) {
+        Query query = new TermQuery(new Term("date", m.group(1)));
+        BoostQuery b = new BoostQuery(query, boost);
+        builder.add(b, BooleanClause.Occur.SHOULD);
       }
       return builder;
   }
 
   // Añade las queries correspondientes a los periodos o años que se quieren buscar
-  private static BooleanQuery.Builder construirConsultaTemporal(BooleanQuery.Builder builder, List<String> fields, String[] tokensNeed, Analyzer analyzer) {
-    Pattern pSiglo = Pattern.compile("[MDCLXVI]+");
+  private static BooleanQuery.Builder construirConsultaTemporal(BooleanQuery.Builder builder, Analyzer analyzer, List<String> fields, String[] tokensNeed, float boost) {
+
+    Pattern pSiglo = Pattern.compile("[mdclxvi]+");
     for (String token : tokensNeed) {
+      token = token.toLowerCase();
       Matcher m = pSiglo.matcher(token);
       // boolean b = m.matches();
       if (m.matches())
       {
-        System.out.println("Siglo: " + token + " = " + romanoToInt(token));
-        int siglo = romanoToInt(token);
+        System.out.println("Siglo: " + token + " = " + romanoToInt(token.toUpperCase()));
+        int siglo = romanoToInt(token.toUpperCase());
         for (var campo: fields) { // se busca en cada campo
-          PhraseQuery.Builder phraseBuilder = new PhraseQuery.Builder();
-          phraseBuilder.add(new Term(campo, "año"), 0); // ej: siglo XX -> año 19..
-          phraseBuilder.add(new Term(campo, token), 1);
-          PhraseQuery pq = phraseBuilder.build();
+// TODO: ????????????????????????????????????
+//          QueryParser parser = new QueryParser(campo, analyzer);
+//          Query q= null;
+//          try {
+//            q = parser.parse("año " + (siglo-1)+"??");
+//          } catch (ParseException e) {
+//            e.printStackTrace();
+//          }
+//          BoostQuery b = new BoostQuery(q, boost);
+//          builder.add(b, BooleanClause.Occur.SHOULD);
           Query query = new TermQuery(new Term(campo, token)); // se busca el siglo tal cual
-          BoostQuery b = new BoostQuery(query, 0.5f);
-          builder.add(b.getQuery(), BooleanClause.Occur.SHOULD);
+          var b = new BoostQuery(query, boost);
+          builder.add(b, BooleanClause.Occur.SHOULD);
         }
       }
     }
@@ -483,7 +484,7 @@ public class SearchFiles {
   }
 
   public static List<Map<String, String>> parseNeeds(File file) throws ParserConfigurationException, IOException, SAXException {
-    List<Map<String, String>> iNeedsList = new ArrayList<Map<String, String>>();
+    List<Map<String, String>> iNeedsList = new ArrayList<>();
     if (file.canRead() && !file.isDirectory()) {
       FileInputStream fis;
       try {
@@ -514,7 +515,7 @@ public class SearchFiles {
 
 
   private static Map<String, String> processNeed(Node nNode) {
-    Map<String,String> conts = new HashMap<String,String>();
+    Map<String,String> conts = new HashMap<>();
     NodeList iNeedL = nNode.getChildNodes();
     for (int temp = 0; temp < iNeedL.getLength(); temp++) {
       Node nodo = iNeedL.item(temp);
