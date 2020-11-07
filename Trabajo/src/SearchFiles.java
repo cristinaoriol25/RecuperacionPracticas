@@ -182,7 +182,7 @@ public class SearchFiles {
 
 
     String[] otrosTokens = tokenizer.tokenize("Pepe María es José, Cristina y Mike");
-    // construirConsultaNombresPropios(builder, nameFinder, camposNombres, otrosTokens, analyzer); // No funciona por el es-ner
+     //construirConsultaNombresPropios(builder, nameFinder, camposNombres, otrosTokens, analyzer); // No funciona por el es-ner
     builder = construirConsultaTipo(builder, textNeed, analyzer, 0.7f);
 
     builder = construirConsultaLenguaje(builder, textNeed, 10.0f);
@@ -328,9 +328,13 @@ public class SearchFiles {
     Pattern publicacion=Pattern.compile(".*publicados? en ([0-9]+).*");
 
     Pattern publicacion1=Pattern.compile(".*publicados? entre ([0-9]+) y ([0-9]+).*");
+
+    Pattern publicacion2= Pattern.compile(".*los últimos ([0-9]+) años.*"); //".*los últimos ([0-9]+) años.*"
+
       need=need.toLowerCase();
       Matcher m = publicacion.matcher(need);
       Matcher m1 = publicacion1.matcher(need);
+      Matcher m2= publicacion2.matcher(need);
       if (m1.matches()) {
         System.out.println("Yep: " + m1.group(1) + "..."+m1.group(2));
         BytesRef n1= new BytesRef(m1.group(1)); // 1er año
@@ -342,6 +346,15 @@ public class SearchFiles {
       if (m.matches()) {
         Query query = new TermQuery(new Term("date", m.group(1)));
         BoostQuery b = new BoostQuery(query, boost);
+        builder.add(b, BooleanClause.Occur.SHOULD);
+      }
+      if(m2.matches()){
+        Calendar c = Calendar.getInstance();
+        int annio=c.get(Calendar.YEAR)- Integer.valueOf (m2.group(1));
+        BytesRef n1= new BytesRef(Integer.toString(annio)); // 1er año
+        BytesRef n2= new BytesRef(Integer.toString(c.get(Calendar.YEAR))); // 2o
+        TermRangeQuery t=new TermRangeQuery("date", n1, n2, true, true);
+        BoostQuery b = new BoostQuery(t, boost);
         builder.add(b, BooleanClause.Occur.SHOULD);
       }
       return builder;
