@@ -14,29 +14,28 @@ import org.apache.lucene.analysis.StopwordAnalyzerBase;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.WordlistLoader;
-import org.apache.lucene.analysis.Analyzer.TokenStreamComponents;
 import org.apache.lucene.analysis.miscellaneous.SetKeywordMarkerFilter;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.util.IOUtils;
 
-public final class SpanishAnalyzer2 extends StopwordAnalyzerBase {
+public final class NuestroSpanishAnalyzer extends StopwordAnalyzerBase {
     private final CharArraySet stemExclusionSet;
     public static final String DEFAULT_STOPWORD_FILE = "spanish_stop.txt";
 
     public static CharArraySet getDefaultStopSet() {
-        return SpanishAnalyzer2.DefaultSetHolder.DEFAULT_STOP_SET;
+        return NuestroSpanishAnalyzer.DefaultSetHolder.DEFAULT_STOP_SET;
     }
 
-    public SpanishAnalyzer2() {
-        this(SpanishAnalyzer2.DefaultSetHolder.DEFAULT_STOP_SET);
+    public NuestroSpanishAnalyzer() {
+        this(NuestroSpanishAnalyzer.DefaultSetHolder.DEFAULT_STOP_SET);
     }
 
-    public SpanishAnalyzer2(CharArraySet stopwords) {
+    public NuestroSpanishAnalyzer(CharArraySet stopwords) {
         this(stopwords, CharArraySet.EMPTY_SET);
     }
 
-    public SpanishAnalyzer2(CharArraySet stopwords, CharArraySet stemExclusionSet) {
+    public NuestroSpanishAnalyzer(CharArraySet stopwords, CharArraySet stemExclusionSet) {
         super(stopwords);
         this.stemExclusionSet = CharArraySet.unmodifiableSet(CharArraySet.copy(stemExclusionSet));
     }

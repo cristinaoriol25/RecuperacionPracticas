@@ -45,7 +45,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-//import SpanishAnalyzer2;
+//import NuestroSpanishAnalyzer;
 
 /** Index all text files under a directory.
  * <p>
@@ -96,7 +96,7 @@ public class IndexFiles {
       System.out.println("Indexing to directory '" + indexPath + "'...");
 
       Directory dir = FSDirectory.open(Paths.get(indexPath));
-      Analyzer analyzer = new Nuestroanalyzer();
+      Analyzer analyzer = new NuestroSpanishAnalyzer();
       IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 
       if (create) {

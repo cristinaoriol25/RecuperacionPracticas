@@ -170,7 +170,7 @@ public class SearchFiles {
     }
     IndexSearcher searcher = new IndexSearcher(reader);
 
-    Analyzer analyzer = new Nuestroanalyzer();
+    Analyzer analyzer = new NuestroSpanishAnalyzer();
 
     List<String> camposGenerales = Arrays.asList("title", "description", "subject");
     BooleanQuery.Builder builder = construirConsultaGeneral(camposGenerales, textNeed, analyzer, 1f);
@@ -187,7 +187,7 @@ public class SearchFiles {
 
     builder = construirConsultaLenguaje(builder, textNeed, 10.0f);
 //
-    builder = construirConsultaTemporal(builder, analyzer, camposGenerales, tokensNeed, 1f);
+    builder = construirConsultaTemporal(builder, camposGenerales, tokensNeed, 1f);
     builder = construirConsultaPublicado(builder, textNeed, analyzer, 5.0f);
 
     BooleanQuery booleanQuery = builder.build();
@@ -243,13 +243,13 @@ public class SearchFiles {
 
   private static BooleanQuery.Builder construirConsultaLenguaje(BooleanQuery.Builder builder, String textNeed, float boost) {
     String needLower = textNeed.toLowerCase();
-    if (needLower.contains("en inglés")) {
+    if (needLower.contains("en inglés") || needLower.contains("in english")) {
       //System.out.println("en inglessssssssssssssssssssssssssssssssss");
       Query query = new TermQuery(new Term("language", "eng"));
       BoostQuery b = new BoostQuery(query, boost); // peso
       builder.add(b, BooleanClause.Occur.SHOULD);
     }
-    if (needLower.contains("en español")) {
+    if (needLower.contains("en español") || needLower.contains("in spanish")) { // if y no else por si acaso aparecen los dos
       Query query = new TermQuery(new Term("language", "spa"));
       BoostQuery b = new BoostQuery(query, boost); // peso
       builder.add(b, BooleanClause.Occur.SHOULD);
@@ -273,6 +273,7 @@ public class SearchFiles {
     }
     return builder;
   }
+
   private static BooleanQuery.Builder construirConsultaTipo(BooleanQuery.Builder builder, String textNeed, Analyzer analyzer, float boost) {
     if(textNeed.contains("Tesis") || textNeed.contains("tesis") ) {
       Query query = new TermQuery(new Term("type", "TESIS"));
@@ -361,7 +362,7 @@ public class SearchFiles {
   }
 
   // Añade las queries correspondientes a los periodos o años que se quieren buscar
-  private static BooleanQuery.Builder construirConsultaTemporal(BooleanQuery.Builder builder, Analyzer analyzer, List<String> fields, String[] tokensNeed, float boost) {
+  private static BooleanQuery.Builder construirConsultaTemporal(BooleanQuery.Builder builder, List<String> fields, String[] tokensNeed, float boost) {
 
     Pattern pSiglo = Pattern.compile("[mdclxvi]+");
     for (String token : tokensNeed) {
@@ -373,18 +374,11 @@ public class SearchFiles {
         System.out.println("Siglo: " + token + " = " + romanoToInt(token.toUpperCase()));
         int siglo = romanoToInt(token.toUpperCase());
         for (var campo: fields) { // se busca en cada campo
-// TODO: ????????????????????????????????????
-//          QueryParser parser = new QueryParser(campo, analyzer);
-//          Query q= null;
-//          try {
-//            q = parser.parse("año " + (siglo-1)+"??");
-//          } catch (ParseException e) {
-//            e.printStackTrace();
-//          }
-//          BoostQuery b = new BoostQuery(q, boost);
-//          builder.add(b, BooleanClause.Occur.SHOULD);
+          WildcardQuery q = new WildcardQuery(new Term(campo,(siglo-1)+"??")); // Se busca un año que empiece por (siglo-1)
+          BoostQuery b = new BoostQuery(q, boost);                                  // por ej, siglo xx -> año 19??
+          builder.add(b, BooleanClause.Occur.SHOULD);
           Query query = new TermQuery(new Term(campo, token)); // se busca el siglo tal cual
-          var b = new BoostQuery(query, boost);
+          b = new BoostQuery(query, boost);
           builder.add(b, BooleanClause.Occur.SHOULD);
         }
       }
