@@ -111,7 +111,7 @@ public class Evaluation {
       double precisionAt10 = precisionAtK(recuperadosNeed, relevanciasNeed, 10);
       double avgPrecision = avgPrecision(recuperadosNeed, relevanciasNeed);
       System.out.println("Need " + (need+1) + "\nprecision: " + precision + "\nrecall: " + recall + "\nF1: " + f1score);
-      evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, f1score,f1score, prec_recall)); // TODO: parametros bien
+      evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, precisionAt10,avgPrecision, prec_recall)); // TODO: parametros bien
       // TODO: sacar el resto de medidas
     }
     EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
