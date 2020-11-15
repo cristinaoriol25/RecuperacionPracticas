@@ -56,23 +56,36 @@ public class Evaluation {
       }
     }
     relevancias = parseQRels(qrelsFileN);
-    for (var eval : relevancias) {
+    /*for (var eval : relevancias) {
       System.out.println(eval);
-    }
+    }*/
     resultados = parseResults(resultsFileN);
-    for (var res : resultados) {
+    /*for (var res : resultados) {
       System.out.println(res);
-    }
+    }*/
     List<EvaluacionNeed> evaluaciones = evaluar(relevancias, resultados);
     escribirEvaluaciones(outputFileN, evaluaciones);
   }
 
   private static void escribirEvaluaciones(String outputFileN, List<EvaluacionNeed> evaluaciones) {
     // TODO: escribir al fichero como en el enunciado
-    
-    for (EvaluacionNeed evaluacion : evaluaciones) {
-      // TODO: escribir
+    try {
+      FileWriter myWriter = new FileWriter(outputFileN);
+      int iNeed = 1; // cuenta de infoneed
+      for (EvaluacionNeed evaluacion : evaluaciones) {
+        escribirEvaluacionNeed(myWriter, evaluacion, iNeed++);
+      }
+      myWriter.close();
+    } catch (IOException e) {
+      System.out.println("Error de escritura!");
+      e.printStackTrace();
     }
+
+  }
+
+  private static void escribirEvaluacionNeed(FileWriter myWriter, EvaluacionNeed evaluacion, int iNeed) throws IOException {
+    myWriter.write("INORMATION NEED " + iNeed + "\n");
+    myWriter.write(evaluacion.toString() + "\n\n");
   }
 
   // TODO:
@@ -83,7 +96,7 @@ public class Evaluation {
      * ptos prec_recall - N
      * ptos interpolados - N
      * interpolacion total - N
-     * escribir a fichero - N
+                                            * escribir a fichero - N
    */
 
   private static List<EvaluacionNeed> evaluar(List<Map<Integer, Boolean>> relevancias, List<List<Integer>> resultados) {
@@ -102,7 +115,7 @@ public class Evaluation {
       // TODO: sacar el resto de medidas
     }
     EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
-    evaluaciones.add(total);
+    // evaluaciones.add(total); // TODO: descomentar
     return evaluaciones;
   }
 
@@ -179,10 +192,10 @@ public class Evaluation {
           System.out.println("Linea con menos de 2 elementos en fichero " + resultsFileN);
           System.exit(1);
         }
-        for (var s : tokens) {
+        /*for (var s : tokens) {
           System.out.println(s);
           System.out.println("------------------");
-        }
+        }*/
         int need = Integer.parseInt(tokens[0].trim());
         if (resultados.size()<need){
           resultados.add(new ArrayList<Integer>());
@@ -219,10 +232,10 @@ public class Evaluation {
         int docId = Integer.parseInt(tokens[1].trim());
         boolean relevante = tokens[2].trim().equals("1");
         relevancias.get(need-1).put(docId, relevante);
-        for (var s : tokens) {
+        /*for (var s : tokens) {
           System.out.println(s);
           System.out.println("------------------");
-        }
+        }*/
         //documentos.add(new Documento(Integer.parseInt(tokens[0].trim()), Integer.parseInt(tokens[1].trim()), tokens[2].trim().equals("1")));
       }
       scan.close();
