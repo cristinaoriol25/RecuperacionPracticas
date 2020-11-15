@@ -161,7 +161,7 @@ public class Evaluation {
     while(i<recuperadosNeed.size()){
       int documento=recuperadosNeed.get(i);
       if (relevanciasNeed.get(documento)) { // si es relevante
-        precisionAtK(recuperadosNeed, relevanciasNeed, i+1);
+        p+=precisionAtK(recuperadosNeed, relevanciasNeed, i+1);
         relevantes++;
       }
       i++;
