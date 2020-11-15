@@ -69,9 +69,22 @@ public class Evaluation {
 
   private static void escribirEvaluaciones(String outputFileN, List<EvaluacionNeed> evaluaciones) {
     // TODO: escribir al fichero como en el enunciado
-    // TODO: calcular la EvaluacionNeed promedio a partir del resto y escribirla tb
+    
+    for (EvaluacionNeed evaluacion : evaluaciones) {
+      // TODO: escribir
+    }
   }
 
+  // TODO:
+  /*
+     * precisionatK - C
+     * avgPrecision - C
+     * promedios de otros para total (prec, rec, f1, map, at10....) - C
+     * ptos prec_recall - N
+     * ptos interpolados - N
+     * interpolacion total - N
+     * escribir a fichero - N
+   */
 
   private static List<EvaluacionNeed> evaluar(List<Map<Integer, Boolean>> relevancias, List<List<Integer>> resultados) {
     List<EvaluacionNeed> evaluaciones = new ArrayList<>();
@@ -81,11 +94,31 @@ public class Evaluation {
       double precision = precision(recuperadosNeed, relevanciasNeed);
       double recall = recall(recuperadosNeed, relevanciasNeed);
       double f1score = 2f * precision * recall / (precision + recall);
+      List<Double[]> prec_recall = puntosPR(precision, recall, f1score);
+      double precisionAt10 = precisionAtK(recuperadosNeed, relevanciasNeed, 10);
+      double avgPrecision = avgPrecision(recuperadosNeed, relevanciasNeed);
       System.out.println("Need " + (need+1) + "\nprecision: " + precision + "\nrecall: " + recall + "\nF1: " + f1score);
-      evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, f1score,f1score)); // TODO: parametros bien
+      evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, f1score,f1score, prec_recall)); // TODO: parametros bien
       // TODO: sacar el resto de medidas
     }
+    EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
+    evaluaciones.add(total);
     return evaluaciones;
+  }
+
+  private static List<Double[]> puntosPR(double precision, double recall, double f1score) {
+    List<Double[]> ptos = new ArrayList<>();
+    return ptos;
+  }
+
+  private static double avgPrecision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
+    // TODO:
+    return 0;
+  }
+
+  private static double precisionAtK(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed, int i) {
+    // TODO
+    return 0;
   }
 
   private static double precision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {

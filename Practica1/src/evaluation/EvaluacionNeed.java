@@ -1,18 +1,32 @@
 package evaluation;
 
+import java.util.List;
+
 public class EvaluacionNeed {
     private double precision;
     private double recall;
     private double f1score;
     private double precAt10;
     private double avgPrecision;
-    //private List<> //TODO: ver como hacer los puntos de precision-recall
-    public EvaluacionNeed(double precision, double recall, double f1score, double precAt10, double avgPrecision) {
+    private List<Double[]> ptosPR;//TODO: ver como hacer los puntos de precision-recall
+    private List<Double[]> ptosPRInterpolados;
+    public EvaluacionNeed(double precision, double recall, double f1score, double precAt10, double avgPrecision, List<Double[]> ptosPR) {
         this.precision = precision;
         this.recall = recall;
         this.f1score = f1score;
         this.precAt10 = precAt10;
         this.avgPrecision = avgPrecision;
+        this.ptosPR=ptosPR;
+        setInterpolarPR();
+    }
+
+    private void setInterpolarPR() {
+        this.ptosPRInterpolados = ptosPR; // TODO
+        // TODO
+    }
+
+    public EvaluacionNeed(List<EvaluacionNeed> evaluaciones) {
+        // TODO: sacar media, etc
     }
 
     public double getPrecision() {
