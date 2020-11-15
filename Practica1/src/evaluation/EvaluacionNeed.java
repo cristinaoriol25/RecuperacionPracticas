@@ -26,6 +26,7 @@ public class EvaluacionNeed {
     }
 
     public EvaluacionNeed(List<EvaluacionNeed> evaluaciones) {
+
         // TODO: sacar media, etc
     }
 

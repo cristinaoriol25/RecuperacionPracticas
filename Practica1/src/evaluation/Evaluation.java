@@ -106,19 +106,38 @@ public class Evaluation {
     return evaluaciones;
   }
 
+
   private static List<Double[]> puntosPR(double precision, double recall, double f1score) {
     List<Double[]> ptos = new ArrayList<>();
     return ptos;
   }
 
   private static double avgPrecision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
-    // TODO:
-    return 0;
+    int i=0;
+    double p=0;
+    int relevantes=0;
+    while(i<recuperadosNeed.size()){
+      int documento=recuperadosNeed.get(i);
+      if (relevanciasNeed.get(documento)) { // si es relevante
+        precisionAtK(recuperadosNeed, relevanciasNeed, i+1);
+        relevantes++;
+      }
+      i++;
+    }
+    return p/(relevantes);
   }
 
-  private static double precisionAtK(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed, int i) {
-    // TODO
-    return 0;
+  private static double precisionAtK(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed, int k) {
+    double p=0;
+    int i=0;
+    while(i<k){
+      int documento=recuperadosNeed.get(i);
+      if (relevanciasNeed.get(documento)) { // si es relevante
+        p++; // se cuenta
+      }
+      i++;
+    }
+    return (p/k);
   }
 
   private static double precision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
