@@ -95,7 +95,7 @@ public class EvaluacionNeed {
             s +=  "\naverage_precision " + decimal(avgPrecision) +
                     "\nrecall_precision ";
             for (Double[] pto : ptosPR) {
-                s+= "\n" + decimal(pto[0]) + decimal(pto[1]);
+                s+= "\n" + decimal(pto[0]) + " " + decimal(pto[1]);
             }
         }
         else {
