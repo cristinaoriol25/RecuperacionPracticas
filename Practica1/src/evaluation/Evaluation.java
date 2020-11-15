@@ -84,19 +84,24 @@ public class Evaluation {
   }
 
   private static void escribirEvaluacionNeed(FileWriter myWriter, EvaluacionNeed evaluacion, int iNeed) throws IOException {
-    myWriter.write("INORMATION NEED " + iNeed + "\n");
+    if (evaluacion.isTotal()) {
+      myWriter.write("TOTAL:\n");
+    }
+    else {
+      myWriter.write("INORMATION NEED " + iNeed + "\n");
+    }
     myWriter.write(evaluacion.toString() + "\n\n");
   }
 
   // TODO:
-  /*
+  /*                                                  HECHO
      * precisionatK - C
      * avgPrecision - C
      * promedios de otros para total (prec, rec, f1, map, at10....) - C
-     * ptos prec_recall - N
-     * ptos interpolados - N
+                                                   * ptos prec_recall - N
+                                                   * ptos interpolados - N
      * interpolacion total - N
-                                            * escribir a fichero - N
+                                                    * escribir a fichero - N
    */
 
   private static List<EvaluacionNeed> evaluar(List<Map<Integer, Boolean>> relevancias, List<List<Integer>> resultados) {
@@ -104,10 +109,12 @@ public class Evaluation {
     for (int need = 0; need<relevancias.size(); need++) {
       List<Integer> recuperadosNeed = resultados.get(need);
       Map<Integer, Boolean> relevanciasNeed = relevancias.get(need);
-      double precision = precision(recuperadosNeed, relevanciasNeed);
-      double recall = recall(recuperadosNeed, relevanciasNeed);
-      double f1score = 2f * precision * recall / (precision + recall);
       List<Double[]> prec_recall = puntosPR (relevanciasNeed, recuperadosNeed);
+      // La prec y recall son los del ultimo punto:
+      double precision = prec_recall.get(prec_recall.size()-1)[1];//precision(recuperadosNeed, relevanciasNeed);
+      double recall = prec_recall.get(prec_recall.size()-1)[0];//recall(recuperadosNeed, relevanciasNeed);
+      double f1score = 2f * precision * recall / (precision + recall);
+
               //puntosPR(precision, recall, f1score);
       double precisionAt10 = precisionAtK(recuperadosNeed, relevanciasNeed, 10);
       double avgPrecision = avgPrecision(recuperadosNeed, relevanciasNeed);
@@ -116,7 +123,7 @@ public class Evaluation {
       // TODO: sacar el resto de medidas
     }
     EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
-    // evaluaciones.add(total); // TODO: descomentar
+    evaluaciones.add(total); // TODO: descomentar
     return evaluaciones;
   }
 
@@ -124,31 +131,34 @@ public class Evaluation {
     List<Double[]> ptos = new ArrayList<>();
     int recall = 0;
     int nRelevantes = 0;
+    //System.out.println(recuperadosNeed);
     for (Map.Entry<Integer, Boolean> entry : relevanciasNeed.entrySet()) {
+      //System.out.println(entry.getKey() +" "+ entry.getValue());
+      //System.out.println("---" + recall + " " + nRelevantes);
       boolean relevante = entry.getValue();
+      //System.out.println(relevante);
       if (relevante) { // es relevante
         nRelevantes++; // lo contamos
         int docId = entry.getKey();
+        //System.out.println(docId);
         if (recuperadosNeed.contains(docId)) { // Relevante y recuperado
           recall++;
-          System.out.println(recall + " " + nRelevantes);
-          ptos.add(new Double[]{Double.valueOf(recall)/Double.valueOf(nRelevantes), 0.0});
+          //System.out.println(recall + " " + nRelevantes);
+          ptos.add(new Double[]{Double.valueOf(recall), 0.0});
         }
       }
     }
+    List <Double> precs = precisiones(recuperadosNeed, relevanciasNeed);
+    int i=0;
+    for (var pto : ptos) {
+      pto[0] = pto[0]/nRelevantes;
+      pto[1] = precs.get(i++);
+    }
+
     return ptos; // porcentaje de relevantes recuperados
   }
 
 
-  private static List<Double[]> puntosPR(double precision, double recall, double f1score) {
-    List<Double[]> ptos = new ArrayList<>();
-    double nuevaP = precParaRecallYF1(recall, f1score);
-    System.out.println(precision + " " + nuevaP);
-    while (nuevaP<1) {
-
-    }
-    return ptos;
-  }
 
   private static double precParaRecallYF1(double r, double f1) {
     return -(r*f1)/(f1-2*r);
@@ -182,14 +192,19 @@ public class Evaluation {
     return (p/k);
   }
 
-  private static double precision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
+  private static List<Double> precisiones(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
+    List<Double> precisiones = new ArrayList<>();
     int precision = 0;
+    int total = 0;
     for (int documento : recuperadosNeed) { // para cada doc recuperado
+      total++;
       if (relevanciasNeed.get(documento)) { // si es relevante
         precision++; // se cuenta
+        precisiones.add(Double.valueOf(precision)/Double.valueOf(total));
       }
     }
-    return Double.valueOf(precision)/Double.valueOf(recuperadosNeed.size()); // se devuelve entre 0 y 1
+
+    return precisiones;//Double.valueOf(precision)/Double.valueOf(recuperadosNeed.size()); // se devuelve entre 0 y 1
   }
 
   private static double recall(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class EvaluacionNeed {
+    private final int N_PTOS_INTER = 11; // Num de puntos para la interpolacion
+
     private boolean esTotal;
     private double precision;
     private double recall;
@@ -26,11 +28,30 @@ public class EvaluacionNeed {
         esTotal = false;
     }
 
+
+
     private void setInterpolarPR() {
         //this.ptosPRInterpolados = ptosPR; // TODO
         this.ptosPRInterpolados = new ArrayList<>();
-        this.ptosPRInterpolados.addAll(ptosPR);
-        // TODO
+        //this.ptosPRInterpolados.addAll(ptosPR);
+        double step = 0.1; // distancia entre cada recall
+        for (int i = 0; i<N_PTOS_INTER; i++) {
+            double recPto = i*step; // recall del punto
+            double precPto = precisionInterpolada(recPto); // su precision
+            ptosPRInterpolados.add(new Double[]{recPto, precPto});
+        }
+    }
+
+    /*
+        precisión interpolada a un nivel de exhaustividad r
+        se define como la precisión más alta encontrada para cualquier nivel de exhaustividad r’>=r
+    */
+    private double precisionInterpolada(double recPto) {
+        double maxPrec = 0;
+        for (var pto : ptosPR) {
+            if (pto[0] >= recPto && pto[1] > maxPrec) maxPrec = pto[1];
+        }
+        return maxPrec;
     }
 
     public EvaluacionNeed(List<EvaluacionNeed> evaluaciones) {
@@ -52,6 +73,27 @@ public class EvaluacionNeed {
         f1score=f1score/ evaluaciones.size();
         precAt10=precAt10/ evaluaciones.size();
         avgPrecision=avgPrecision/ evaluaciones.size();
+        promediarPtosInterpolados(evaluaciones);
+    }
+
+    private void promediarPtosInterpolados(List<EvaluacionNeed> evaluaciones) {
+        ptosPRInterpolados = new ArrayList<>();
+        for (int i = 0; i<N_PTOS_INTER; i++) {
+            Double[] pto = getPromedioPR(evaluaciones, i);
+            ptosPRInterpolados.add(pto);
+        }
+    }
+
+    // Devuelve el pto con i-esimo recall y precision promedio de las evaluaciones
+    private Double[] getPromedioPR(List<EvaluacionNeed> evaluaciones, int i) {
+        double prec = 0;
+        double rec = -1;
+        for (var evaluacion : evaluaciones) {
+            Double[] ptoI = evaluacion.ptosPRInterpolados.get(i);
+            rec = ptoI[0];
+            prec += ptoI[1];
+        }
+        return new Double[]{rec, prec/evaluaciones.size()};
     }
 
     public double getPrecision() {
@@ -121,5 +163,9 @@ public class EvaluacionNeed {
             s+= "\n" + decimal(pto[0]) + " " + decimal(pto[1]);
         }
         return s;
+    }
+
+    public boolean isTotal() {
+        return esTotal;
     }
 }
