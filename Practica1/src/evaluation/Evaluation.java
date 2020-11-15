@@ -118,12 +118,12 @@ public class Evaluation {
               //puntosPR(precision, recall, f1score);
       double precisionAt10 = precisionAtK(recuperadosNeed, relevanciasNeed, 10);
       double avgPrecision = avgPrecision(recuperadosNeed, relevanciasNeed);
-      System.out.println("Need " + (need+1) + "\nprecision: " + precision + "\nrecall: " + recall + "\nF1: " + f1score);
+      //System.out.println("Need " + (need+1) + "\nprecision: " + precision + "\nrecall: " + recall + "\nF1: " + f1score);
       evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, precisionAt10,avgPrecision, prec_recall)); // TODO: parametros bien
-      // TODO: sacar el resto de medidas
+
     }
     EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
-    evaluaciones.add(total); // TODO: descomentar
+    evaluaciones.add(total);
     return evaluaciones;
   }
 
