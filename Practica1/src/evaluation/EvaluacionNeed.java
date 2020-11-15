@@ -11,7 +11,7 @@ public class EvaluacionNeed {
     private double recall;
     private double f1score;
     private double precAt10;
-    private double avgPrecision;
+    private double avgPrecision; // en la final esto será el MAP (porque viene a ser lo puto mismo)
     private List<Double[]> ptosPR;//TODO: ver como hacer los puntos de precision-recall
     private List<Double[]> ptosPRInterpolados;
     private double map;
@@ -35,8 +35,23 @@ public class EvaluacionNeed {
 
     public EvaluacionNeed(List<EvaluacionNeed> evaluaciones) {
         esTotal = true;
-
-        // TODO: sacar media, etc
+        precision=0;
+        recall=0;
+        f1score=0;
+        precAt10=0;
+        avgPrecision=0;
+        for(EvaluacionNeed ev : evaluaciones){
+            precision+=ev.getPrecision();
+            recall+=ev.getRecall();
+            f1score+=ev.getF1score();
+            precAt10+=ev.getPrecAt10();
+            avgPrecision+=getAvgPrecision();
+        }
+        precision=precision/ evaluaciones.size();
+        recall=recall/ evaluaciones.size();
+        f1score=f1score/ evaluaciones.size();
+        precAt10=precAt10/ evaluaciones.size();
+        avgPrecision=avgPrecision/ evaluaciones.size();
     }
 
     public double getPrecision() {

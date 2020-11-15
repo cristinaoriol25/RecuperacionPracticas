@@ -111,8 +111,9 @@ public class Evaluation {
               //puntosPR(precision, recall, f1score);
       double precisionAt10 = precisionAtK(recuperadosNeed, relevanciasNeed, 10);
       double avgPrecision = avgPrecision(recuperadosNeed, relevanciasNeed);
-      evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, f1score,f1score, prec_recall)); // TODO: parametros bien
-      //System.out.println("Need " + (need+1) + "precision: " + precision + "\nrecall: " + recall + "\nF1: " + f1score);
+      System.out.println("Need " + (need+1) + "\nprecision: " + precision + "\nrecall: " + recall + "\nF1: " + f1score);
+      evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, precisionAt10,avgPrecision, prec_recall)); // TODO: parametros bien
+      // TODO: sacar el resto de medidas
     }
     EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
     // evaluaciones.add(total); // TODO: descomentar
@@ -154,13 +155,31 @@ public class Evaluation {
   }
 
   private static double avgPrecision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
-    // TODO:
-    return 0;
+    int i=0;
+    double p=0;
+    int relevantes=0;
+    while(i<recuperadosNeed.size()){
+      int documento=recuperadosNeed.get(i);
+      if (relevanciasNeed.get(documento)) { // si es relevante
+        precisionAtK(recuperadosNeed, relevanciasNeed, i+1);
+        relevantes++;
+      }
+      i++;
+    }
+    return p/(relevantes);
   }
 
-  private static double precisionAtK(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed, int i) {
-    // TODO
-    return 0;
+  private static double precisionAtK(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed, int k) {
+    double p=0;
+    int i=0;
+    while(i<k){
+      int documento=recuperadosNeed.get(i);
+      if (relevanciasNeed.get(documento)) { // si es relevante
+        p++; // se cuenta
+      }
+      i++;
+    }
+    return (p/k);
   }
 
   private static double precision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
