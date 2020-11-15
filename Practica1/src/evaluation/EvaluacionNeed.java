@@ -1,8 +1,12 @@
 package evaluation;
 
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class EvaluacionNeed {
+    private boolean esTotal;
     private double precision;
     private double recall;
     private double f1score;
@@ -10,6 +14,7 @@ public class EvaluacionNeed {
     private double avgPrecision;
     private List<Double[]> ptosPR;//TODO: ver como hacer los puntos de precision-recall
     private List<Double[]> ptosPRInterpolados;
+    private double map;
     public EvaluacionNeed(double precision, double recall, double f1score, double precAt10, double avgPrecision, List<Double[]> ptosPR) {
         this.precision = precision;
         this.recall = recall;
@@ -18,14 +23,19 @@ public class EvaluacionNeed {
         this.avgPrecision = avgPrecision;
         this.ptosPR=ptosPR;
         setInterpolarPR();
+        esTotal = false;
     }
 
     private void setInterpolarPR() {
-        this.ptosPRInterpolados = ptosPR; // TODO
+        //this.ptosPRInterpolados = ptosPR; // TODO
+        this.ptosPRInterpolados = new ArrayList<>();
+        this.ptosPRInterpolados.addAll(ptosPR);
         // TODO
     }
 
     public EvaluacionNeed(List<EvaluacionNeed> evaluaciones) {
+        esTotal = true;
+
         // TODO: sacar media, etc
     }
 
@@ -67,5 +77,34 @@ public class EvaluacionNeed {
 
     public void setAvgPrecision(double avgPrecision) {
         this.avgPrecision = avgPrecision;
+    }
+
+    private String decimal(double val) {
+        return String.format("%.3f", val).replace(',', '.'); // Ponia comas por el español
+    }
+
+    @Override
+    public String toString() {
+        NumberFormat nf_out = NumberFormat.getNumberInstance(Locale.UK);
+        nf_out.setMaximumFractionDigits(3);
+        String s = "precision " + decimal(precision) +
+                "\nrecall " + decimal(recall) +
+                "\nF1 " + decimal(f1score) +
+                "\nprec@10 " + decimal(precAt10);
+        if (!esTotal) {
+            s +=  "\naverage_precision " + decimal(avgPrecision) +
+                    "\nrecall_precision ";
+            for (Double[] pto : ptosPR) {
+                s+= "\n" + decimal(pto[0]) + decimal(pto[1]);
+            }
+        }
+        else {
+            s += "\nMAP " + decimal(map);
+        }
+        s+= "\ninterpolated_recall_precision";
+        for (Double[] pto : ptosPRInterpolados) {
+            s+= "\n" + decimal(pto[0]) + " " + decimal(pto[1]);
+        }
+        return s;
     }
 }
