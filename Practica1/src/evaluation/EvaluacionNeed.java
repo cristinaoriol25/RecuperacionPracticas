@@ -66,13 +66,13 @@ public class EvaluacionNeed {
             recall+=ev.getRecall();
             f1score+=ev.getF1score();
             precAt10+=ev.getPrecAt10();
-            avgPrecision+=getAvgPrecision();
+            avgPrecision+=ev.getAvgPrecision();
         }
         precision=precision/ evaluaciones.size();
         recall=recall/ evaluaciones.size();
         f1score=f1score/ evaluaciones.size();
         precAt10=precAt10/ evaluaciones.size();
-        avgPrecision=avgPrecision/ evaluaciones.size();
+        map=avgPrecision/ evaluaciones.size();
         promediarPtosInterpolados(evaluaciones);
     }
 
