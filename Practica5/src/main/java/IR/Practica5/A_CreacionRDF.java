@@ -40,6 +40,16 @@ public class A_CreacionRDF {
                       model.createResource()
                            .addProperty(VCARD.Given, givenName)
                            .addProperty(VCARD.Family, familyName));
+
+        johnSmith.addProperty(foaf., );
+
+
+//        Resource cRistina = model.createResource(personURI)
+//                .addProperty(VCARD.FN, fullName)
+//                .addProperty(VCARD.N,
+//                        model.createResource()
+//                                .addProperty(VCARD.Given, givenName)
+//                                .addProperty(VCARD.Family, familyName));
         return model;
 	}
 	
