@@ -9,6 +9,9 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.FileManager;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Ejemplo de lectura de un modelo RDF de un fichero de texto 
  * y como acceder por API a los elementos que contiene
@@ -16,7 +19,42 @@ import org.apache.jena.util.FileManager;
 public class D_AccesoRDF {
 
 	public static void main(String args[]) {
+		//codigoInicial();
 
+		String uri = "http://dig.csail.mit.edu/2008/webdav/timbl/foaf.rdf";
+		mostrarRecursosCompartenPropiedad(uri);
+
+
+	}
+
+	private static void mostrarRecursosCompartenPropiedad(String uri) {
+		// cargamos el fichero deseado
+		Model model = FileManager.get().loadModel("card.rdf");
+		// valores de todas las propiedades del recurso:
+		Resource res = model
+				.getResource(uri);
+		StmtIterator it = res.listProperties();
+		Set<Resource> recursosQueCompartenProp = new HashSet<>();
+		while (it.hasNext()) {
+			Statement st = it.next();
+			Property prop = st.getPredicate();
+			//System.out.println("Propiedad: " + prop + " -------- ");
+			// mostramos todos los recursos que contienen una propiedad determinada
+			// forma alternativa que usa un filtro sobre los statements a recuperar
+			StmtIterator it2 = model.listStatements(null, prop, (RDFNode) null);
+			while (it2.hasNext()) {
+				Statement st2 = it2.next();
+				Resource r = st2.getSubject();
+				recursosQueCompartenProp.add(r);
+			}
+		}
+		System.out.println("Comparten propiedades: ");
+		for (var r : recursosQueCompartenProp) {
+			System.out.println(r);
+		}
+	}
+
+	private static void codigoInicial() {
 		// cargamos el fichero deseado
 		Model model = FileManager.get().loadModel("card.rdf");
 
