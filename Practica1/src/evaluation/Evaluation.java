@@ -26,9 +26,13 @@ import java.util.*;
 
 /** Simple command-line based search demo. */
 public class Evaluation {
+  private static int MAX_RES_NEED = 45; // num de resultados de cada need tenidos en cuenta
 
-  private static List<List<Integer>> resultados;
-  private static List<Map<Integer, Boolean>> relevancias;
+  //private static List<List<Integer>> resultados;
+  //private static List<Map<String, Integer>> resultados;
+  private static Map<String, List<String>> resultados; // para cada need (str), lista de docs (ints)
+  //private static List<Map<Integer, Boolean>> relevancias;
+  private static Map<String, Map<String, Boolean>> relevancias;
   private Evaluation() {}
 
   /** Simple command-line based search demo. */
@@ -63,17 +67,17 @@ public class Evaluation {
     /*for (var res : resultados) {
       System.out.println(res);
     }*/
-    List<EvaluacionNeed> evaluaciones = evaluar(relevancias, resultados);
+    Map<String, EvaluacionNeed> evaluaciones = evaluar(relevancias, resultados);
     escribirEvaluaciones(outputFileN, evaluaciones);
   }
 
-  private static void escribirEvaluaciones(String outputFileN, List<EvaluacionNeed> evaluaciones) {
-    // TODO: escribir al fichero como en el enunciado
+  private static void escribirEvaluaciones(String outputFileN, Map<String, EvaluacionNeed> evaluaciones) {
     try {
       FileWriter myWriter = new FileWriter(outputFileN);
-      int iNeed = 1; // cuenta de infoneed
-      for (EvaluacionNeed evaluacion : evaluaciones) {
-        escribirEvaluacionNeed(myWriter, evaluacion, iNeed++);
+      //int iNeed = 1; // cuenta de infoneed
+      for (Map.Entry<String, EvaluacionNeed> entry : evaluaciones.entrySet()) {
+        String need = entry.getKey();
+        escribirEvaluacionNeed(myWriter, entry.getValue(), need);
       }
       myWriter.close();
     } catch (IOException e) {
@@ -83,7 +87,7 @@ public class Evaluation {
 
   }
 
-  private static void escribirEvaluacionNeed(FileWriter myWriter, EvaluacionNeed evaluacion, int iNeed) throws IOException {
+  private static void escribirEvaluacionNeed(FileWriter myWriter, EvaluacionNeed evaluacion, String iNeed) throws IOException {
     if (evaluacion.isTotal()) {
       myWriter.write("TOTAL:\n");
     }
@@ -104,11 +108,15 @@ public class Evaluation {
                                                     * escribir a fichero - N
    */
 
-  private static List<EvaluacionNeed> evaluar(List<Map<Integer, Boolean>> relevancias, List<List<Integer>> resultados) {
-    List<EvaluacionNeed> evaluaciones = new ArrayList<>();
-    for (int need = 0; need<relevancias.size(); need++) {
-      List<Integer> recuperadosNeed = resultados.get(need);
-      Map<Integer, Boolean> relevanciasNeed = relevancias.get(need);
+  private static Map<String, EvaluacionNeed> evaluar(Map<String, Map<String, Boolean>> relevancias, Map<String, List<String>> resultados) {
+    Map<String, EvaluacionNeed> evaluaciones = new HashMap<>();
+    //((for (int need = 0; need<relevancias.size(); need++) {
+    for (Map.Entry<String, Map<String, Boolean>> entry : relevancias.entrySet()) {
+      String need = entry.getKey();
+      Map<String, Boolean> relevanciasNeed = entry.getValue();
+
+      List<String> recuperadosNeed = resultados.get(need);
+
       List<Double[]> prec_recall = puntosPR (relevanciasNeed, recuperadosNeed);
       // La prec y recall son los del ultimo punto:
       double precision = prec_recall.get(prec_recall.size()-1)[1];//precision(recuperadosNeed, relevanciasNeed);
@@ -119,27 +127,27 @@ public class Evaluation {
       double precisionAt10 = precisionAtK(recuperadosNeed, relevanciasNeed, 10);
       double avgPrecision = avgPrecision(recuperadosNeed, relevanciasNeed);
       //System.out.println("Need " + (need+1) + "\nprecision: " + precision + "\nrecall: " + recall + "\nF1: " + f1score);
-      evaluaciones.add(new EvaluacionNeed(precision, recall, f1score, precisionAt10,avgPrecision, prec_recall)); // TODO: parametros bien
+      evaluaciones.put(need, new EvaluacionNeed(precision, recall, f1score, precisionAt10,avgPrecision, prec_recall)); // TODO: parametros bien
 
     }
     EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
-    evaluaciones.add(total);
+    evaluaciones.put("TOTAL",total);
     return evaluaciones;
   }
 
-  private static List<Double[]> puntosPR(Map<Integer, Boolean> relevanciasNeed, List<Integer> recuperadosNeed) {
+  private static List<Double[]> puntosPR(Map<String, Boolean> relevanciasNeed, List<String> recuperadosNeed) {
     List<Double[]> ptos = new ArrayList<>();
     int recall = 0;
     int nRelevantes = 0;
     //System.out.println(recuperadosNeed);
-    for (Map.Entry<Integer, Boolean> entry : relevanciasNeed.entrySet()) {
+    for (Map.Entry<String, Boolean> entry : relevanciasNeed.entrySet()) {
       //System.out.println(entry.getKey() +" "+ entry.getValue());
       //System.out.println("---" + recall + " " + nRelevantes);
       boolean relevante = entry.getValue();
       //System.out.println(relevante);
       if (relevante) { // es relevante
         nRelevantes++; // lo contamos
-        int docId = entry.getKey();
+        String docId = entry.getKey();
         //System.out.println(docId);
         if (recuperadosNeed.contains(docId)) { // Relevante y recuperado
           recall++;
@@ -164,13 +172,13 @@ public class Evaluation {
     return -(r*f1)/(f1-2*r);
   }
 
-  private static double avgPrecision(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
+  private static double avgPrecision(List<String> recuperadosNeed, Map<String, Boolean> relevanciasNeed) {
     int i=0;
     double p=0;
     int relevantes=0;
     while(i<recuperadosNeed.size()){
-      int documento=recuperadosNeed.get(i);
-      if (relevanciasNeed.get(documento)) { // si es relevante
+      String documento=recuperadosNeed.get(i);
+      if (relevanciasNeed.containsKey(documento) && relevanciasNeed.get(documento)) { // si es relevante
         p+=precisionAtK(recuperadosNeed, relevanciasNeed, i+1);
         relevantes++;
       }
@@ -179,12 +187,12 @@ public class Evaluation {
     return p/(relevantes);
   }
 
-  private static double precisionAtK(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed, int k) {
+  private static double precisionAtK(List<String> recuperadosNeed, Map<String, Boolean> relevanciasNeed, int k) {
     double p=0;
     int i=0;
     while(i<k){
-      int documento=recuperadosNeed.get(i);
-      if (relevanciasNeed.get(documento)) { // si es relevante
+      String documento=recuperadosNeed.get(i);
+      if (relevanciasNeed.containsKey(documento) && relevanciasNeed.get(documento)) { // si es relevante
         p++; // se cuenta
       }
       i++;
@@ -192,13 +200,13 @@ public class Evaluation {
     return (p/k);
   }
 
-  private static List<Double> precisiones(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
+  private static List<Double> precisiones(List<String> recuperadosNeed, Map<String, Boolean> relevanciasNeed) {
     List<Double> precisiones = new ArrayList<>();
     int precision = 0;
     int total = 0;
-    for (int documento : recuperadosNeed) { // para cada doc recuperado
+    for (String documento : recuperadosNeed) { // para cada doc recuperado
       total++;
-      if (relevanciasNeed.get(documento)) { // si es relevante
+      if (relevanciasNeed.containsKey(documento) && relevanciasNeed.get(documento)) { // si es relevante
         precision++; // se cuenta
         precisiones.add(Double.valueOf(precision)/Double.valueOf(total));
       }
@@ -207,14 +215,14 @@ public class Evaluation {
     return precisiones;//Double.valueOf(precision)/Double.valueOf(recuperadosNeed.size()); // se devuelve entre 0 y 1
   }
 
-  private static double recall(List<Integer> recuperadosNeed, Map<Integer, Boolean> relevanciasNeed) {
+  private static double recall(List<Integer> recuperadosNeed, Map<String, Boolean> relevanciasNeed) {
     int recall = 0;
     int nRelevantes = 0;
-    for (Map.Entry<Integer, Boolean> entry : relevanciasNeed.entrySet()) {
+    for (Map.Entry<String, Boolean> entry : relevanciasNeed.entrySet()) {
       boolean relevante = entry.getValue();
       if (relevante) { // es relevante
         nRelevantes++; // lo contamos
-        int docId = entry.getKey();
+        String docId = entry.getKey();
         if (recuperadosNeed.contains(docId)) { // Relevante y recuperado
           recall++;
         }
@@ -223,8 +231,8 @@ public class Evaluation {
     return Double.valueOf(recall)/Double.valueOf(nRelevantes); // porcentaje de relevantes recuperados
   }
 
-  private static List<List<Integer>> parseResults(String resultsFileN) {
-    List<List<Integer>> resultados= new ArrayList<>();
+  private static Map<String, List<String>> parseResults(String resultsFileN) {
+    Map<String, List<String>> resultados = new HashMap<>();
     File resultsFile = new File(resultsFileN);
     Scanner scan = null;
     try {
@@ -240,12 +248,16 @@ public class Evaluation {
           System.out.println(s);
           System.out.println("------------------");
         }*/
-        int need = Integer.parseInt(tokens[0].trim());
-        if (resultados.size()<need){
-          resultados.add(new ArrayList<Integer>());
+        String need = (tokens[0].trim());
+        // {105: [1 2 3 8], }
+        if (!resultados.containsKey(need)) {
+          resultados.put(need, new ArrayList<String>());
         }
-        int docId = Integer.parseInt(tokens[1].trim());
-        resultados.get(need-1).add(docId);
+        String docId = (tokens[1].trim());
+        List<String> resNeed = resultados.get(need);
+        if (resNeed.size() < MAX_RES_NEED) { // Solo MAX_RES_NEED por need
+          resNeed.add(docId);
+        }
         //documentos.add(new Documento(Integer.parseInt(tokens[0].trim()), Integer.parseInt(tokens[1].trim())));
       }
       scan.close();
@@ -256,8 +268,8 @@ public class Evaluation {
   }
 
 
-  private static List<Map<Integer, Boolean>> parseQRels(String qrelsFileN) {
-    List<Map<Integer, Boolean>> relevancias = new ArrayList<Map<Integer,Boolean>>();//[{},,,,]
+  private static Map<String, Map<String, Boolean>> parseQRels(String qrelsFileN) {
+    Map<String, Map<String, Boolean>> relevancias = new HashMap<>();//[{},,,,]
     File qrelsFile = new File(qrelsFileN);
     Scanner scan = null;
     try {
@@ -269,13 +281,13 @@ public class Evaluation {
           System.out.println("Linea con menos de 3 elementos en fichero qrels");
           System.exit(1);
         }
-        int need = Integer.parseInt(tokens[0].trim());
-        if (relevancias.size()<need){
-          relevancias.add(new HashMap<Integer, Boolean>());
+        String need = (tokens[0].trim());
+        if (!relevancias.containsKey(need)){
+          relevancias.put(need, new HashMap<String, Boolean>());
         }
-        int docId = Integer.parseInt(tokens[1].trim());
+        String docId = (tokens[1].trim());
         boolean relevante = tokens[2].trim().equals("1");
-        relevancias.get(need-1).put(docId, relevante);
+        relevancias.get(need).put(docId, relevante);
         /*for (var s : tokens) {
           System.out.println(s);
           System.out.println("------------------");

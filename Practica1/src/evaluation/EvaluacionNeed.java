@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class EvaluacionNeed {
     private final int N_PTOS_INTER = 11; // Num de puntos para la interpolacion
@@ -54,14 +55,16 @@ public class EvaluacionNeed {
         return maxPrec;
     }
 
-    public EvaluacionNeed(List<EvaluacionNeed> evaluaciones) {
+    public EvaluacionNeed(Map<String, EvaluacionNeed> evaluaciones) {
         esTotal = true;
         precision=0;
         recall=0;
         f1score=0;
         precAt10=0;
         avgPrecision=0;
-        for(EvaluacionNeed ev : evaluaciones){
+        for (Map.Entry<String, EvaluacionNeed> entry : evaluaciones.entrySet()) {
+            //String need = entry.getKey();
+            EvaluacionNeed ev = entry.getValue();
             precision+=ev.getPrecision();
             recall+=ev.getRecall();
             f1score+=ev.getF1score();
@@ -73,7 +76,7 @@ public class EvaluacionNeed {
         f1score=f1score/ evaluaciones.size();
         precAt10=precAt10/ evaluaciones.size();
         map=avgPrecision/ evaluaciones.size();
-        promediarPtosInterpolados(evaluaciones);
+        promediarPtosInterpolados(new ArrayList<>(evaluaciones.values()));
     }
 
     private void promediarPtosInterpolados(List<EvaluacionNeed> evaluaciones) {
