@@ -5,7 +5,13 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.SKOS;
 import org.apache.jena.vocabulary.VCARD;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 /**
  * Ejemplo de como construir un modelo de Jena y añadir nuevos recursos 
@@ -16,10 +22,10 @@ public class A_CreacionRDF {
 	/**
 	 * muestra un modelo de jena de ejemplo por pantalla
 	 */
-	public static void main (String args[]) {
-        Model model = A_CreacionRDF.generarEjemplo();
+	public static void main (String args[]) throws FileNotFoundException {
+        Model model = A_CreacionRDF.generarmodelo();
         // write the model in the standar output
-        model.write(System.out); 
+        model.write(new FileOutputStream(new File("rdfs.xml")),"RDF/XML");
     }
 	
 	/**
@@ -68,6 +74,75 @@ public class A_CreacionRDF {
 
         return model;
 	}
-	
+
+	public static Model generarmodelo(){
+        String root = "http://nuestraraiz/";
+        Model model=ModelFactory.createDefaultModel();
+
+        //Añadimos nuestras clases:
+        //Tipos de documentos
+        Resource documento=model.createResource(root+"Documento")
+                    .addProperty(RDFS.subClassOf, String.valueOf(RDF.class)); //no sería necesario ponerlo no?
+        Resource tesis=model.createResource(root+"Tesis")
+                .addProperty(RDFS.subClassOf, documento);
+        Resource tfg=model.createResource(root+"TFG")
+                .addProperty(RDFS.subClassOf, documento);
+        Resource tfm=model.createResource(root+"TFM")
+                .addProperty(RDFS.subClassOf, documento);
+        Resource tfc=model.createResource(root+"TFC")
+                .addProperty(RDFS.subClassOf, documento);
+
+        //Personas:
+        Resource contributor=model.createResource(root+"Contributor")
+                .addProperty(RDFS.subClassOf, FOAF.Person);
+
+        Resource creator=model.createResource(root+"Creator")
+                .addProperty(RDFS.subClassOf, FOAF.Person);
+
+        //Departamento
+        Resource departamento=model.createResource(root+"Departamento")
+                .addProperty(RDFS.subClassOf, FOAF.Agent);
+
+        //Idioma
+        Resource idioma=model.createResource(root+"Idioma");
+
+        //Añadimos nuestras propiedades:
+
+        Resource contribuido= model.createProperty(root+"contribuido") //No estoy segura si está bien dejarlo como resource sin indicar tipo propiedad y tal pero es que no se ocmo
+                .addProperty(RDFS.range, contributor)
+                .addProperty(RDFS.domain, documento);
+
+        Resource creado= model.createProperty(root+"creado")
+                .addProperty(RDFS.range, creator)
+                .addProperty(RDFS.domain, documento);
+
+        Resource publisher= model.createProperty(root+"publisher")
+                .addProperty(RDFS.range, departamento)
+                .addProperty(RDFS.domain, documento);
+
+        Resource idiomaDoc=model.createProperty(root+"Idioma-documento")
+                .addProperty(RDFS.range, idioma)
+                .addProperty(RDFS.domain, documento);
+
+        Resource tema=model.createProperty(root+"Tema")
+                .addProperty(RDFS.range, SKOS.Concept)
+                .addProperty(RDFS.domain, documento);
+
+        Resource date=model.createProperty(root+"Date")
+                .addProperty(RDFS.range, RDFS.Literal)
+                .addProperty(RDFS.domain, documento);
+        Resource title=model.createProperty(root+"Title")
+                .addProperty(RDFS.range, RDFS.Literal)
+                .addProperty(RDFS.domain, documento);
+        Resource Description=model.createProperty(root+"Date")
+                .addProperty(RDFS.range, RDFS.Literal)
+                .addProperty(RDFS.domain, documento);
+        Resource Subject=model.createProperty(root+"Subject")
+                .addProperty(RDFS.range, RDFS.Literal)
+                .addProperty(RDFS.domain, documento);
+
+
+        return model;
+    }
 	
 }
