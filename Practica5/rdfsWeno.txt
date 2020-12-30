@@ -1,0 +1,61 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+  <rdf:Description rdf:about="http://nuestraraiz/creado">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range>
+      <rdf:Description rdf:about="http://nuestraraiz/Creator">
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+      </rdf:Description>
+    </rdfs:range>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/TFM">
+    <rdfs:subClassOf rdf:resource="http://nuestraraiz/Documento"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/Title">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/TFG">
+    <rdfs:subClassOf rdf:resource="http://nuestraraiz/Documento"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/Subject">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/contribuido">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range>
+      <rdf:Description rdf:about="http://nuestraraiz/Contributor">
+        <rdfs:subClassOf rdf:resource="http://xmlns.com/foaf/0.1/Person"/>
+      </rdf:Description>
+    </rdfs:range>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/Date">
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#gYear"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/TFC">
+    <rdfs:subClassOf rdf:resource="http://nuestraraiz/Documento"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/Nombre-departamento">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Departamento"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2000/01/rdf-schema#Literal"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/Tema">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range rdf:resource="http://www.w3.org/2004/02/skos/core#Concept"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/Idioma-documento">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range rdf:resource="http://nuestraraiz/Idioma"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/Tesis">
+    <rdfs:subClassOf rdf:resource="http://nuestraraiz/Documento"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://nuestraraiz/publisher">
+    <rdfs:domain rdf:resource="http://nuestraraiz/Documento"/>
+    <rdfs:range rdf:resource="http://nuestraraiz/Departamento"/>
+  </rdf:Description>
+</rdf:RDF>

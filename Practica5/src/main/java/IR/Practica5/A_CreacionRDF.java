@@ -4,10 +4,7 @@ import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.sparql.vocabulary.FOAF;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
-import org.apache.jena.vocabulary.SKOS;
-import org.apache.jena.vocabulary.VCARD;
+import org.apache.jena.vocabulary.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -81,8 +78,7 @@ public class A_CreacionRDF {
 
         //Añadimos nuestras clases:
         //Tipos de documentos
-        Resource documento=model.createResource(root+"Documento")
-                    .addProperty(RDFS.subClassOf, String.valueOf(RDF.class)); //no sería necesario ponerlo no?
+        Resource documento=model.createResource(root+"Documento");
         Resource tesis=model.createResource(root+"Tesis")
                 .addProperty(RDFS.subClassOf, documento);
         Resource tfg=model.createResource(root+"TFG")
@@ -100,8 +96,7 @@ public class A_CreacionRDF {
                 .addProperty(RDFS.subClassOf, FOAF.Person);
 
         //Departamento
-        Resource departamento=model.createResource(root+"Departamento")
-                .addProperty(RDFS.subClassOf, FOAF.Agent);
+        Resource departamento=model.createResource(root+"Departamento");
 
         //Idioma
         Resource idioma=model.createResource(root+"Idioma");
@@ -129,17 +124,20 @@ public class A_CreacionRDF {
                 .addProperty(RDFS.domain, documento);
 
         Resource date=model.createProperty(root+"Date")
-                .addProperty(RDFS.range, RDFS.Literal)
+                .addProperty(RDFS.range, XSD.gYear)
                 .addProperty(RDFS.domain, documento);
         Resource title=model.createProperty(root+"Title")
                 .addProperty(RDFS.range, RDFS.Literal)
                 .addProperty(RDFS.domain, documento);
-        Resource Description=model.createProperty(root+"Date")
+        Resource description=model.createProperty(root+"Date")
                 .addProperty(RDFS.range, RDFS.Literal)
                 .addProperty(RDFS.domain, documento);
-        Resource Subject=model.createProperty(root+"Subject")
+        Resource subject=model.createProperty(root+"Subject")
                 .addProperty(RDFS.range, RDFS.Literal)
                 .addProperty(RDFS.domain, documento);
+        Resource nomDepartamento=model.createProperty(root+"Nombre-departamento")
+                .addProperty(RDFS.range, RDFS.Literal)
+                .addProperty(RDFS.domain, departamento);
 
 
         return model;
