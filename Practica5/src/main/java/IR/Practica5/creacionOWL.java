@@ -3,11 +3,8 @@ package IR.Practica5;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
-import org.apache.jena.vocabulary.VCARD;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,13 +14,13 @@ import java.io.FileOutputStream;
  * Ejemplo de como construir un modelo de Jena y añadir nuevos recursos 
  * mediante la clase Model
  */
-public class creacionSKOS {
+public class creacionOWL {
 	
 	/**
 	 * muestra un modelo de jena de ejemplo por pantalla
 	 */
 	public static void main (String args[]) throws FileNotFoundException {
-        Model model = creacionSKOS.generarEjemplo();
+        Model model = creacionOWL.generarEjemplo();
         // write the model in the standar output
         //model.write(System.out);
         // Guardamos como turtle (ttl)
