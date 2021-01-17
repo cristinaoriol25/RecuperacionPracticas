@@ -81,53 +81,71 @@ public class A_CreacionRDF {
         Resource documento=model.createResource(root+"Documento")
                 .addProperty(RDFS.comment, "Documento de un trabajo académico de Zaguán", "es");
         Resource tesis=model.createResource(root+"Tesis")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.subClassOf, documento)
                 .addProperty(RDFS.comment, "Trabajo de tipo tesis", "es");
         Resource tfg=model.createResource(root+"TFG")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.subClassOf, documento)
-                .addProperty(RDFS.comment, "Trabajo de fin de grado", "es");
+                .addProperty(RDFS.comment, "Trabajo de fin de grado", "es")
+                .addProperty(OWL.disjointWith, tesis);
         Resource tfm=model.createResource(root+"TFM")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.subClassOf, documento)
-                .addProperty(RDFS.comment, "Trabajo de fin de master", "es");
+                .addProperty(RDFS.comment, "Trabajo de fin de master", "es")
+                .addProperty(OWL.disjointWith, tesis)
+                .addProperty(OWL.disjointWith, tfg);
         Resource tfc=model.createResource(root+"TFC")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.subClassOf, documento)
-                .addProperty(RDFS.comment, "Trabajo de fin de carrera, nombre antiguo de TFG", "es");
+                .addProperty(RDFS.comment, "Trabajo de fin de carrera, nombre antiguo de TFG", "es")
+                .addProperty(OWL.disjointWith, tesis)
+                .addProperty(OWL.disjointWith, tfg)
+                .addProperty(OWL.disjointWith, tfm);
 
         //Personas:
         Resource contributor=model.createResource(root+"Contributor")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.subClassOf, FOAF.Person)
                 .addProperty(RDFS.comment, "Contribuyente a un trabajo (generalmente un profesor)", "es");
 
         Resource creator=model.createResource(root+"Creator")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.subClassOf, FOAF.Person)
                 .addProperty(RDFS.comment, "Creador de un trabajo", "es");
 
         //Departamento
         Resource departamento=model.createResource(root+"Departamento")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.comment, "Departamento de universidad", "es");
 
         //Idioma
         Resource idioma=model.createResource(root+"Idioma")
+                .addProperty(RDF.type, OWL.Class)
                 .addProperty(RDFS.comment, "Idioma natural", "es");
 
         //Añadimos nuestras propiedades:
 
         Resource contribuido= model.createProperty(root+"contribuido") //No estoy segura si está bien dejarlo como resource sin indicar tipo propiedad y tal pero es que no se ocmo
+                .addProperty(RDF.type, OWL.ObjectProperty)
                 .addProperty(RDFS.range, contributor)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Un contributor ha contribuido en la creacion de un documento.", "es");
 
         Resource creado= model.createProperty(root+"creado")
+                .addProperty(RDF.type, OWL.ObjectProperty)
                 .addProperty(RDFS.range, creator)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Un creador ha creado un documento", "es");
 
         Resource publisher= model.createProperty(root+"publisher")
+                .addProperty(RDF.type, OWL.ObjectProperty)
                 .addProperty(RDFS.range, departamento)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Departamento de universidad que publica el documento", "es");
 
         Resource idiomaDoc=model.createProperty(root+"Idioma-documento")
+                .addProperty(RDF.type, OWL.ObjectProperty)
                 .addProperty(RDFS.range, idioma)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Idioma de un documento", "es");
@@ -138,22 +156,27 @@ public class A_CreacionRDF {
                 .addProperty(RDFS.comment, "Tema de un documento (rango conceptos de skos:concept)", "es");
 
         Resource date=model.createProperty(root+"date")
+                .addProperty(RDF.type, OWL.DatatypeProperty)
                 .addProperty(RDFS.range, XSD.gYear)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Fecha. Concretamente año.", "es");
         Resource title=model.createProperty(root+"title")
+                .addProperty(RDF.type, OWL.DatatypeProperty)
                 .addProperty(RDFS.range, RDFS.Literal)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Título de un documento", "es");
         Resource description=model.createProperty(root+"description")
+                .addProperty(RDF.type, OWL.DatatypeProperty)
                 .addProperty(RDFS.range, RDFS.Literal)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Descripción de un documento", "es");
         Resource subject=model.createProperty(root+"Subject")
+                .addProperty(RDF.type, OWL.DatatypeProperty)
                 .addProperty(RDFS.range, RDFS.Literal)
                 .addProperty(RDFS.domain, documento)
                 .addProperty(RDFS.comment, "Tema de un documento definido según el propio documento (rango literal)", "es");
         Resource nomDepartamento=model.createProperty(root+"Nombre-departamento")
+                .addProperty(RDF.type, OWL.DatatypeProperty)
                 .addProperty(RDFS.range, RDFS.Literal)
                 .addProperty(RDFS.domain, departamento)
                 .addProperty(RDFS.comment, "Nombre de un departamento de la universidad", "es");
