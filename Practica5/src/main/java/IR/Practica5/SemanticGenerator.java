@@ -261,7 +261,7 @@ public class SemanticGenerator {
         // TODO : {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
         //Analyzer analyzer = new NuestroSpanishAnalyzer();
         List<String> clavesTextos = Arrays.asList("title", "contributor", "subject", "description", "creator", "publisher");
-        for (var clave : clavesTextos) { // para cada lista de textos
+        for (var clave : campos.keySet()) { // para cada lista de textos
             for (String texto : campos.get(clave)) { // para cada texto en el doc de entrada
                 // Tokenizar (obtener palabras o raices):
                 List<String> tokens = tokenizar(texto);
