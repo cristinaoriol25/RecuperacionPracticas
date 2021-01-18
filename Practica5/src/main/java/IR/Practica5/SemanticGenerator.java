@@ -60,6 +60,10 @@ public class SemanticGenerator {
         Model modeloOwl = cargarModelo(owlPath, "RDF/XML");
         Model rdfOut = procesarDirectorio(modeloSkos, modeloOwl, docDir);
         rdfOut.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
+        // ------------------------- Se pueden unir los tres modelos en un solo fichero:
+        //Model unido = rdfOut.union(modeloSkos);
+        //unido = unido.union(modeloOwl);
+        //unido.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
     }
 
 
