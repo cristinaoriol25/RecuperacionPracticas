@@ -4,8 +4,8 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
 
 import java.io.*;
@@ -72,8 +72,8 @@ public class SemanticSearcher {
             {
                 System.out.println("tengo cosas");
                 QuerySolution soln = results.nextSolution() ;
-                Literal x = soln.getLiteral("tema");
-                //String uri = x.getURI();
+                Resource x = soln.getResource("x");
+                String uri = x.getURI();
                 myWriter.write(nConsulta +": "+ x);
             }
         } finally { qexec.close() ; }
