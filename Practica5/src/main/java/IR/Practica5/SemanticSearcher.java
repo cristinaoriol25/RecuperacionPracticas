@@ -4,6 +4,7 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
@@ -62,17 +63,81 @@ public class SemanticSearcher {
         FileWriter myWriter = new FileWriter(output);
         String[] Consulta=consulta.split(" ", 2);
         String nConsulta=Consulta[0];
-        String query=Consulta[1];
-
-        QueryExecution qexec = QueryExecutionFactory.create(query, model) ;
+        //String query=Consulta[1];
+        String query = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+                "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+                "PREFIX raiz:<http://nuestraraiz/> " +
+                "PREFIX skos:<http://www.w3.org/2004/02/skos/core#>" +
+                "PREFIX documento:<http://nuestraraiz/Documento> " +
+                "SELECT ?x WHERE { " +
+                "?x skos:prefLabel \"alzheimer\" . " +
+                "?x rdf:type skos:Concept } ";/* +
+                "?x raiz:Tema ?concepto . " +
+                "?x rdf:type ?tipo . ?tipo rdfs:subclassOf raiz:Documento } ";*/
+        String query_2 = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+                "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
+                "PREFIX raiz:<http://nuestraraiz/> " +
+                "PREFIX skos:<http://www.w3.org/2004/02/skos/core#>" +
+                "PREFIX documento:<http://nuestraraiz/Documento> " +
+                "SELECT ?x " +
+                "WHERE { ?x rdf:type ?tipo . " +
+                "?tipo rdfs:subClassOf raiz:Documento . " +
+                "?x raiz:Tema ?concepto . " +
+                "?concepto skos:prefLabel \"alzheimer\" } ";// +
+        //Estoy interesado en trabajos académicos sobre Bioinformática (también conocida como Biología Computacional,
+        // Bioinformatics o Computational Biology) o Filogenética (Phylogenetics), publicados entre 2010 y 2018.
+        String queryNecesidad4 = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+                "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+                "PREFIX foaf: <http://xmlns.com/foaf/0.1/> "+
+                "PREFIX raiz:<http://nuestraraiz/> " +
+                "PREFIX skos:<http://www.w3.org/2004/02/skos/core#>" +
+                "PREFIX documento:<http://nuestraraiz/Documento> " +
+                "SELECT DISTINCT ?x ?date WHERE { " +
+                "?x raiz:date ?date . " +
+                "FILTER ( ?date >= \"2010\" ) . " +
+                "FILTER ( ?date <= \"2018\" ) . " +
+                "?x raiz:Tema ?concepto . " +
+                "{" +
+                "{?concepto skos:prefLabel \"bioinformatica\"@es } UNION " +
+                "{?concepto skos:prefLabel \"bioinformatics\"@en } UNION " +
+                "{?concepto skos:prefLabel \"phylogenetics\"@en } UNION " +
+                "{?concepto skos:prefLabel \"filogenetica\"@es } UNION " +
+                "{?concepto skos:prefLabel \"computational biology\"@en } UNION " +
+                "{?concepto skos:prefLabel \"bioinformatics\"@en }" +
+                "} }";
+        String queryNecesidad5 = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+                "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> " +
+                "PREFIX foaf: <http://xmlns.com/foaf/0.1/> "+
+                "PREFIX raiz:<http://nuestraraiz/> " +
+                "PREFIX skos:<http://www.w3.org/2004/02/skos/core#>" +
+                "PREFIX documento:<http://nuestraraiz/Documento> " +
+                "SELECT ?x ?date WHERE { " +
+                "?x raiz:date ?date . " +
+                "FILTER ( ?date >= \"2012\" ) . " +
+                "?x raiz:Idioma-documento raiz:eng . " +
+                "?x rdf:type raiz:TFG . " +
+                "{" +
+                "{?x raiz:creado ?autor . ?autor foaf:firstName \"Javier\" } " +
+                "UNION " +
+                "{?x raiz:contribuido ?cont . ?cont foaf:firstName \"Javier\" }" +
+                "} . " +
+                "?x raiz:Tema ?concepto . " +
+                "?concepto skos:prefLabel \"informatica\"@es } ";
+        System.out.println(queryNecesidad5);
+                /*"{{?x tema \\\"caciquismo\\\"} UNION {?x tema \\\"dictadura\\\"} " +
+                "UNION {?x tema \\\"represion politica\\\"} UNION {?x tema \\\"huesca\\\"} " +
+                "UNION {?x tema \\\"españa\\\"}}. }\n";*/
+        QueryExecution qexec = QueryExecutionFactory.create(queryNecesidad4, model) ;
         try {
             ResultSet results = qexec.execSelect() ;
             for ( ; results.hasNext() ; )
             {
+                System.out.println("Resultado");
                 QuerySolution soln = results.nextSolution() ;
                 Resource x = soln.getResource("x");
+                Literal date = soln.getLiteral("date");
                 String uri = x.getURI();
-               myWriter.write(nConsulta +": "+ uri);
+                myWriter.write(nConsulta +": "+ uri + " " + date.getValue() + " " + "\n");
             }
         } finally { qexec.close() ; }
         myWriter.close();

@@ -59,11 +59,11 @@ public class SemanticGenerator {
         Model modeloSkos = cargarModelo(skosPath, "TURTLE");
         Model modeloOwl = cargarModelo(owlPath, "RDF/XML");
         Model rdfOut = procesarDirectorio(modeloSkos, modeloOwl, docDir);
-        rdfOut.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
+        //rdfOut.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
         // ------------------------- Se pueden unir los tres modelos en un solo fichero:
-        //Model unido = rdfOut.union(modeloSkos);
-        //unido = unido.union(modeloOwl);
-        //unido.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
+        Model unido = rdfOut.union(modeloSkos);
+        unido = unido.union(modeloOwl);
+        unido.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
     }
 
 
@@ -284,7 +284,7 @@ public class SemanticGenerator {
             //System.out.println(token);
             for (var uri : urisConceptos) {
                 //System.out.println(token + " ... " + uri);
-                doc.addProperty(modeloOwl.getProperty(raiz+"Tema"), uri);
+                doc.addProperty(modeloOwl.getProperty(raiz+"Tema"), modeloSkos.getResource(uri));
             }
 
         }
@@ -295,17 +295,6 @@ public class SemanticGenerator {
         return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
     }
     private static List<String> getURIsConcepto(Model modeloSkos, String token) {
-        /*String queryString = "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
-                "SELECT ?x ?y ?z WHERE { " +
-                "?x foaf:maker " + uri + ". }";*/
-        /*List<String> uris = new ArrayList<>();
-        ResIterator iterator = modeloSkos.listSubjectsWithProperty(SKOS.prefLabel, token, "es");
-        for (; iterator.hasNext();) {
-            System.out.println("Yep");
-            Resource x = iterator.nextResource();
-            uris.add(x.getURI());
-        }
-        return uris;*/
         List<String> uris = new ArrayList<>();
         StmtIterator it = modeloSkos.listStatements(null, SKOS.prefLabel, (RDFNode) null);
         while (it.hasNext()) {
