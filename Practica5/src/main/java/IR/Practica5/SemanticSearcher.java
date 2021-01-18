@@ -4,8 +4,8 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
 
 import java.io.*;
@@ -49,6 +49,7 @@ public class SemanticSearcher {
                 break;
             }
             procesarConsulta(line, outputPath, modelo);
+            break;
         }
 
     }
@@ -63,16 +64,17 @@ public class SemanticSearcher {
         String[] Consulta=consulta.split(" ", 2);
         String nConsulta=Consulta[0];
         String query=Consulta[1];
-
+        System.out.println(query);
         QueryExecution qexec = QueryExecutionFactory.create(query, model) ;
         try {
             ResultSet results = qexec.execSelect() ;
             for ( ; results.hasNext() ; )
             {
+                System.out.println("tengo cosas");
                 QuerySolution soln = results.nextSolution() ;
-                Resource x = soln.getResource("x");
-                String uri = x.getURI();
-               myWriter.write(nConsulta +": "+ uri);
+                Literal x = soln.getLiteral("tema");
+                //String uri = x.getURI();
+                myWriter.write(nConsulta +": "+ x);
             }
         } finally { qexec.close() ; }
         myWriter.close();
