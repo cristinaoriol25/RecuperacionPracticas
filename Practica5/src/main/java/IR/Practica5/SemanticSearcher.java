@@ -50,6 +50,7 @@ public class SemanticSearcher {
                 break;
             }
             procesarConsulta(line, outputPath, modelo);
+            break;
         }
 
     }
@@ -123,16 +124,14 @@ public class SemanticSearcher {
                 "} . " +
                 "?x raiz:Tema ?concepto . " +
                 "?concepto skos:prefLabel \"informatica\"@es } ";
-        System.out.println(queryNecesidad5);
-                /*"{{?x tema \\\"caciquismo\\\"} UNION {?x tema \\\"dictadura\\\"} " +
-                "UNION {?x tema \\\"represion politica\\\"} UNION {?x tema \\\"huesca\\\"} " +
-                "UNION {?x tema \\\"españa\\\"}}. }\n";*/
-        QueryExecution qexec = QueryExecutionFactory.create(queryNecesidad4, model) ;
+        String query=Consulta[1];
+        System.out.println(query);
+        QueryExecution qexec = QueryExecutionFactory.create(query, model) ;
         try {
             ResultSet results = qexec.execSelect() ;
             for ( ; results.hasNext() ; )
             {
-                System.out.println("Resultado");
+                System.out.println("tengo cosas");
                 QuerySolution soln = results.nextSolution() ;
                 Resource x = soln.getResource("x");
                 Literal date = soln.getLiteral("date");
