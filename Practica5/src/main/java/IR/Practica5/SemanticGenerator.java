@@ -1,8 +1,7 @@
 package IR.Practica5;
 
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.vocabulary.RDF;
@@ -239,13 +238,11 @@ public class SemanticGenerator {
         for (String description : campos.get("description")) { // Para cada subject
             doc.addProperty(modeloOwl.getProperty(raiz+"description"), description);
         }
-        if (campos.get("date").isEmpty()) {
-            System.out.println(uri + " no teine date");
-        } else {
+        if (!campos.get("date").isEmpty()) {
             String date = campos.get("date").get(0);
             doc.addProperty(modeloOwl.getProperty(raiz + "date"), date);
         }
-        //rdfOut = addConceptos(modeloSkos, modeloOwl, rdfOut, campos)
+        rdfOut = addConceptos(modeloSkos, modeloOwl, doc, rdfOut, campos);
                 //
         //rdfOut = procesarIdioma(modeloOwl, rdfOut, campos.get("language"));
         /*for (Map.Entry<String, String> entry : campos.entrySet()) {
@@ -257,6 +254,121 @@ public class SemanticGenerator {
         }*/
         return rdfOut;
     }
+
+    private static Model addConceptos(Model modeloSkos, Model modeloOwl, Resource doc, Model rdfOut,
+                                      Map<String, List<String>> campos)
+    {
+        // TODO : {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
+        //Analyzer analyzer = new NuestroSpanishAnalyzer();
+        List<String> clavesTextos = Arrays.asList("title", "contributor", "subject", "description", "creator", "publisher");
+        for (var clave : clavesTextos) { // para cada lista de textos
+            for (String texto : campos.get(clave)) { // para cada texto en el doc de entrada
+                // Tokenizar (obtener palabras o raices):
+                List<String> tokens = tokenizar(texto);
+                rdfOut = addConceptosTokens(modeloSkos, modeloOwl, doc, rdfOut, tokens);
+
+            }
+        }
+        return rdfOut;
+    }
+
+    private static Model addConceptosTokens(Model modeloSkos, Model modeloOwl, Resource doc, Model rdfOut, List<String> tokens) {
+        for (String token : tokens) {
+            //System.out.println("--"+token+"--");
+
+            List<String> urisConceptos = getURIsConcepto(modeloSkos, token);
+            //System.out.println(token);
+            for (var uri : urisConceptos) {
+                //System.out.println(token + " ... " + uri);
+                doc.addProperty(modeloOwl.getProperty(raiz+"Tema"), uri);
+            }
+
+        }
+        return rdfOut;
+    }
+    // Fuente: https://stackoverflow.com/a/1102916/14997419
+    public static boolean isNumeric(String str) {
+        return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
+    private static List<String> getURIsConcepto(Model modeloSkos, String token) {
+        /*String queryString = "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+                "SELECT ?x ?y ?z WHERE { " +
+                "?x foaf:maker " + uri + ". }";*/
+        /*List<String> uris = new ArrayList<>();
+        ResIterator iterator = modeloSkos.listSubjectsWithProperty(SKOS.prefLabel, token, "es");
+        for (; iterator.hasNext();) {
+            System.out.println("Yep");
+            Resource x = iterator.nextResource();
+            uris.add(x.getURI());
+        }
+        return uris;*/
+        List<String> uris = new ArrayList<>();
+        StmtIterator it = modeloSkos.listStatements(null, SKOS.prefLabel, (RDFNode) null);
+        while (it.hasNext()) {
+            Statement st = it.next();
+
+            if (st.getObject().isLiteral() && st.getLiteral().getLexicalForm().equals(token)) {//
+                //System.out.println(st.getSubject().getURI() + " - "
+                //        + st.getPredicate().getURI() + " - "
+                //        + st.getLiteral().getLexicalForm());
+                uris.add(st.getSubject().getURI());
+            }
+        }
+        return uris;
+    }
+
+    private static List<String> getURIsConceptoSPARQL(Model modeloSkos, String token) {
+        /*String queryString = "PREFIX foaf: <http://xmlns.com/foaf/0.1/> " +
+                "SELECT ?x ?y ?z WHERE { " +
+                "?x foaf:maker " + uri + ". }";*/
+        List<String> uris = new ArrayList<>();
+        String tokenComs = "\""+token+"\"";
+        //System.out.println(tokenComs + " " + tokenComs.length());
+        String queryString = "PREFIX skos: <http://www.w3.org/2004/02/skos/core#> " +
+                "SELECT ?x WHERE {{?x <http://www.w3.org/2004/02/skos/core#prefLabel> " + tokenComs +
+                " } UNION {?x <http://www.w3.org/2004/02/skos/core#altLabel> " + tokenComs + " }. }";
+        //System.out.println("Querystring: " +queryString);
+        //ejecutamos la consulta y obtenemos los resultados
+        Query query = QueryFactory.create(queryString) ;
+        QueryExecution qexec = QueryExecutionFactory.create(query, modeloSkos);
+        try {
+            ResultSet results = qexec.execSelect();
+            for (; results.hasNext(); ) {
+                System.out.println("RESULTADO");
+                QuerySolution soln = results.nextSolution();
+                Resource x = soln.getResource("x");
+                if (x.isLiteral()) {
+                    uris.add(x.getURI());
+//                    System.out.println(x.getURI() + " - "
+//                            + x.getURI() + " - "
+//                            + x.toString());
+                }
+                else {
+                    System.out.println("no es literal");
+                    uris.add(x.getURI());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return uris;
+    }
+
+
+
+
+    private static String sinTildes(String input) {
+        return input.replaceAll("[áàäâ]", "a").replaceAll("[éèêë]", "e")
+                .replaceAll("[îìíï]", "i").replaceAll("[óöòô]", "o")
+                .replaceAll("[úüùû]", "u").replaceAll("ñ", "n");
+    }
+
+    private static List<String> tokenizar(String texto) {
+        String regexTildes = "[]";
+        return Arrays.asList(sinTildes(texto).toLowerCase()
+                .replaceAll("[()\"\\\\',;./:?!¿¡\\-\\[\\]]+", " ").strip().split("[ \n]+"));
+    }
+
 
     private static String[] parseNombre(String nombreCompleto) {
         String[] tokens = nombreCompleto.split("[ ]*,[ ]*");
