@@ -60,21 +60,15 @@ public class SemanticSearcher {
         return FileManager.get().loadModel(skosPath,rdfSyntax);
     }
 
-    private static void procesarConsulta(String consulta, String output, Model model) throws IOException {
-        FileWriter myWriter = new FileWriter(output);
-        String[] Consulta=consulta.split(" ", 2);
-        String nConsulta=Consulta[0];
-        //String query=Consulta[1];
-        String query = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
+    /*Queries viejas:
+    String query = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
                 "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
                 "PREFIX raiz:<http://nuestraraiz/> " +
                 "PREFIX skos:<http://www.w3.org/2004/02/skos/core#>" +
                 "PREFIX documento:<http://nuestraraiz/Documento> " +
                 "SELECT ?x WHERE { " +
                 "?x skos:prefLabel \"alzheimer\" . " +
-                "?x rdf:type skos:Concept } ";/* +
-                "?x raiz:Tema ?concepto . " +
-                "?x rdf:type ?tipo . ?tipo rdfs:subclassOf raiz:Documento } ";*/
+                "?x rdf:type skos:Concept } ";
         String query_2 = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> " +
                 "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+
                 "PREFIX raiz:<http://nuestraraiz/> " +
@@ -123,7 +117,13 @@ public class SemanticSearcher {
                 "{?x raiz:contribuido ?cont . ?cont foaf:firstName \"Javier\" }" +
                 "} . " +
                 "?x raiz:Tema ?concepto . " +
-                "?concepto skos:prefLabel \"informatica\"@es } ";
+                "?concepto skos:prefLabel \"informatica\"@es } ";*/
+
+
+    private static void procesarConsulta(String consulta, String output, Model model) throws IOException {
+        FileWriter myWriter = new FileWriter(output);
+        String[] Consulta=consulta.split(" ", 2);
+        String nConsulta=Consulta[0];
         String query=Consulta[1];
         System.out.println(query);
         QueryExecution qexec = QueryExecutionFactory.create(query, model) ;
