@@ -6,6 +6,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.util.FileManager;
 
 import java.io.*;
@@ -36,6 +37,7 @@ public class SemanticSearcher {
         }
         Model modelo= cargarModelo(rdfPath, "RDF/XML");
         BufferedReader in = null;
+        FileWriter myWriter = new FileWriter(outputPath);
         in = new BufferedReader(new InputStreamReader(new FileInputStream(needsPath), "UTF-8"));
         while(true){
             String line = in.readLine();
@@ -48,9 +50,10 @@ public class SemanticSearcher {
             if (line.length() == 0) {
                 break;
             }
-            procesarConsulta(line, outputPath, modelo);
-            break;
+            procesarConsulta(line, myWriter, modelo);
         }
+        myWriter.close();
+
 
     }
 
@@ -59,25 +62,30 @@ public class SemanticSearcher {
         return FileManager.get().loadModel(skosPath,rdfSyntax);
     }
 
-    private static void procesarConsulta(String consulta, String output, Model model) throws IOException {
-        FileWriter myWriter = new FileWriter(output);
+    private static void procesarConsulta(String consulta, FileWriter myWriter, Model model) throws IOException {
         String[] Consulta=consulta.split(" ", 2);
         String nConsulta=Consulta[0];
         String query=Consulta[1];
         System.out.println(query);
+        String vieja="";
         QueryExecution qexec = QueryExecutionFactory.create(query, model) ;
         try {
             ResultSet results = qexec.execSelect() ;
             for ( ; results.hasNext() ; )
             {
-                System.out.println("tengo cosas");
+                //System.out.println("tengo cosas");
                 QuerySolution soln = results.nextSolution() ;
-                Literal x = soln.getLiteral("tema");
-                //String uri = x.getURI();
-                myWriter.write(nConsulta +": "+ x);
+                Resource x = soln.getResource("x");
+                String uri = x.getURI();
+                if(!vieja.equals(uri) && uri!="") {
+                    vieja=uri;
+                    String[] parseuri=uri.split("/");
+                    Literal t = soln.getLiteral("t");
+                    Resource tema = soln.getResource("tema");
+                    myWriter.write(nConsulta + "   " + "oai_zaguan.unizar.es_"+parseuri[4]+".xml" + "\n");
+                }
             }
         } finally { qexec.close() ; }
-        myWriter.close();
     }
 
 }

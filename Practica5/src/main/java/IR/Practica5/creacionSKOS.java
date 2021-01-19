@@ -3,11 +3,8 @@ package IR.Practica5;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.RDF;
-import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
-import org.apache.jena.vocabulary.VCARD;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,8 +24,8 @@ public class creacionSKOS {
         // write the model in the standar output
         //model.write(System.out);
         // Guardamos como turtle (ttl)
-        String fichero = "tesauro-skos.ttl";
-        model.write(new FileOutputStream(new File(fichero)),"TURTLE");//"N-TRIPLE");
+        String fichero = "tesauro-skos.xml";
+        model.write(new FileOutputStream(new File(fichero)),"RDF/XML");//"N-TRIPLE");
     }
 	
 	/**
