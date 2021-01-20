@@ -10,13 +10,11 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.util.FileManager;
-import org.apache.jena.vocabulary.DCTerms;
 import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.MMapDirectory;
+import org.apache.lucene.store.RAMDirectory;
 
 import java.io.*;
-import java.nio.file.Paths;
 
 public class SemanticSearcher {
     static String raiz = "http://nuestraraiz/";
@@ -44,8 +42,22 @@ public class SemanticSearcher {
         }
        // Model modelo= cargarModelo(rdfPath, "RDF/XML");
 
-        EntityDefinition entDef = new EntityDefinition("uri", "name", ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/","name"));
-        entDef.set("description", DCTerms.description.asNode());
+        EntityDefinition entDef = new EntityDefinition("uri", "name", ResourceFactory.createProperty("http://nuestraraiz/","title"));
+        entDef.set("firstName", ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/","firstName").asNode());
+        entDef.set("prefLabel", ResourceFactory.createProperty("http://www.w3.org/2004/02/skos/core#","prefLabel").asNode());
+        entDef.set("description", ResourceFactory.createProperty("http://nuestraraiz/","description").asNode());
+        entDef.set("Documento", ResourceFactory.createProperty("http://nuestraraiz/","Documento").asNode());
+        entDef.set("tema", ResourceFactory.createProperty("http://nuestraraiz/","Tema").asNode());
+        entDef.set("idioma", ResourceFactory.createProperty("http://nuestraraiz/","Idioma").asNode());
+        entDef.set("Contribuidor", ResourceFactory.createProperty("http://nuestraraiz/","Contribuidor").asNode());
+        entDef.set("Creator", ResourceFactory.createProperty("http://nuestraraiz/","Creator").asNode());
+        entDef.set("creado", ResourceFactory.createProperty("http://nuestraraiz/","creado").asNode());
+        entDef.set("Departamento", ResourceFactory.createProperty("http://nuestraraiz/","Departamento").asNode());
+        entDef.set("Nombre-departamento", ResourceFactory.createProperty("http://nuestraraiz/","Nombre-departamento").asNode());
+        entDef.set("Subject", ResourceFactory.createProperty("http://nuestraraiz/","Subject").asNode());
+        entDef.set("date", ResourceFactory.createProperty("http://nuestraraiz/","date").asNode());
+
+
         TextIndexConfig config = new TextIndexConfig(entDef);
         config.setAnalyzer(new SpanishAnalyzer());
         config.setQueryAnalyzer(new SpanishAnalyzer());
@@ -53,11 +65,12 @@ public class SemanticSearcher {
 
         //definimos el repositorio indexado todo en memoria
         Dataset ds1 = DatasetFactory.createGeneral() ;
-        Directory dir =  new MMapDirectory(Paths.get("/home/cris/Escritorio/Universidad/RecuperacionPracticas/Practica5/index"));
+        //Directory dir =  new MMapDirectory(Paths.get("/home/cris/Escritorio/Universidad/RecuperacionPracticas/Practica5/index"));
+        Directory dir =  new RAMDirectory();
         Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
 
         // cargamos el fichero deseado y lo almacenamos en el repositorio indexado
-        RDFDataMgr.read(ds.getDefaultModel(), "/home/cris/Escritorio/Universidad/RecuperacionPracticas/Practica5/salidardf.xml") ;
+        RDFDataMgr.read(ds.getDefaultModel(), "/home/cris/Escritorio/Universidad/RecuperacionPracticas/Practica5/inf-salidardf.xml") ;
 
         BufferedReader in = null;
         FileWriter myWriter = new FileWriter(outputPath);
@@ -104,7 +117,7 @@ public class SemanticSearcher {
                     String[] parseuri=uri.split("/");
                     Literal t = soln.getLiteral("t");
                     Resource tema = soln.getResource("tema");
-                    Literal score = soln.getLiteral("score");
+                    Literal score = soln.getLiteral("scoreTot");
                     System.out.println(score);
                     myWriter.write(nConsulta + "   " + "oai_zaguan.unizar.es_"+parseuri[4]+".xml" + "\n");
             }
