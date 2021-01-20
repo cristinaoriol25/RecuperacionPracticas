@@ -1,0 +1,4 @@
+105-5 PREFIX text:<http://jena.apache.org/text#> PREFIX ruta:<http://nuestraraiz/> PREFIX foaf:<http://xmlns.com/foaf/0.1/> PREFIX skos:<http://www.w3.org/2004/02/skos/core#> SELECT DISTINCT ?x WHERE { ?x ruta:Tema ?tema . {{(?tema ?score) text:query (skos:prefLabel "represion")} UNION {(?tema ?score) text:query (skos:prefLabel "dictadura")} UNION {(?tema ?score) text:query (skos:prefLabel "caciquismo")} } OPTIONAL {{(?tema ?score2) text:query (skos:prefLabel "Huesca")} UNION {(?tema ?score2) text:query (skos:prefLabel "España")}} OPTIONAL {{(?x ?score3) text:query (ruta:Subject "siglo 20" "XX")} UNION {(?x ?score3) text:query (ruta:title "siglo 20" "XX")} UNION {(?x ?score3) text:query (ruta:description "siglo 20" "XX")}} bind(coalesce(?score,0)+coalesce(?score2, 0)+coalesce(?score3, 0) as ?scoreTot)     } order by desc(?scoreTot)
+
+
+

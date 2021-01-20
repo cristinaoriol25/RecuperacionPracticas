@@ -29,8 +29,9 @@ public class RankingDeResultadosMem {
 	public static void main (String args[]) throws Exception{
 		
 		//definimos la configuración del repositorio indexado
-		EntityDefinition entDef = new EntityDefinition("uri", "name", ResourceFactory.createProperty("http://xmlns.com/foaf/0.1/","name"));
-		entDef.set("description", DCTerms.description.asNode());
+    EntityDefinition entDef = new EntityDefinition("http://nuestraraiz/Documento", "Documento", ResourceFactory.createProperty("http://nuestraraiz/Tema","Tema"));
+    entDef.set("description", DCTerms.description.asNode());
+    entDef.set("title", DCTerms.descripcion.asNode())
 		TextIndexConfig config = new TextIndexConfig(entDef);	   
 	    config.setAnalyzer(new EnglishAnalyzer());
 	    config.setQueryAnalyzer(new EnglishAnalyzer());
