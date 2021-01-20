@@ -50,6 +50,8 @@ public class SemanticSearcher {
         entDef.set("tema", ResourceFactory.createProperty("http://nuestraraiz/","Tema").asNode());
         entDef.set("idioma", ResourceFactory.createProperty("http://nuestraraiz/","Idioma").asNode());
         entDef.set("Contribuidor", ResourceFactory.createProperty("http://nuestraraiz/","Contribuidor").asNode());
+        entDef.set("contribuido", ResourceFactory.createProperty("http://nuestraraiz/","contribuido").asNode());
+        entDef.set("publisher", ResourceFactory.createProperty("http://nuestraraiz/","publisher").asNode());
         entDef.set("Creator", ResourceFactory.createProperty("http://nuestraraiz/","Creator").asNode());
         entDef.set("creado", ResourceFactory.createProperty("http://nuestraraiz/","creado").asNode());
         entDef.set("Departamento", ResourceFactory.createProperty("http://nuestraraiz/","Departamento").asNode());
@@ -89,7 +91,6 @@ public class SemanticSearcher {
                 break;
             }
             procesarConsulta(line, myWriter, ds);
-            break;
         }
         myWriter.close();
 
@@ -118,7 +119,7 @@ public class SemanticSearcher {
                     Literal t = soln.getLiteral("t");
                     Resource tema = soln.getResource("tema");
                     Literal score = soln.getLiteral("scoreTot");
-                    System.out.println(score);
+                    //System.out.println(score);
                     myWriter.write(nConsulta + "   " + "oai_zaguan.unizar.es_"+parseuri[4]+".xml" + "\n");
             }
         } finally { qexec.close() ; }
