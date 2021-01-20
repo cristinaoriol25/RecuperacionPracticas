@@ -24,8 +24,8 @@ public class creacionSKOS {
         // write the model in the standar output
         //model.write(System.out);
         // Guardamos como turtle (ttl)
-        String fichero = "tesauro-skos.xml";
-        model.write(new FileOutputStream(new File(fichero)),"RDF/XML");//"N-TRIPLE");
+        String fichero = "tesauro-skos.ttl";
+        model.write(new FileOutputStream(new File(fichero)),"TURTLE");//"N-TRIPLE");
     }
 	
 	/**
