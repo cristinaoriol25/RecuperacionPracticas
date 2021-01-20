@@ -22,7 +22,7 @@ public class A_CreacionRDF {
 	public static void main (String args[]) throws FileNotFoundException {
         Model model = A_CreacionRDF.generarmodelo();
         // write the model in the standar output
-        model.write(new FileOutputStream(new File("owl.xml")),"RDF/XML");
+        model.write(new FileOutputStream(new File("owl.ttl")),"TURTLE");
     }
 	
 	/**

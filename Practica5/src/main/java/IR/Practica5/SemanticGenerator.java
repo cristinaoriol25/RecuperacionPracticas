@@ -1,10 +1,13 @@
 package IR.Practica5;
 
+import openllet.jena.PelletReasonerFactory;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.util.FileManager;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.apache.jena.vocabulary.SKOS;
 import org.apache.jena.vocabulary.XSD;
 import org.w3c.dom.Node;
@@ -57,13 +60,25 @@ public class SemanticGenerator {
         }
         // cargar skos:
         Model modeloSkos = cargarModelo(skosPath, "TURTLE");
-        Model modeloOwl = cargarModelo(owlPath, "RDF/XML");
+        Model modeloOwl = cargarModelo(owlPath, "TURTLE");
+        // ----------------------------------- PRUEBA Inferencia:
+        //InfModel inf2 = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), modeloOwl.union(modeloSkos));//
+        //inf2.write(new FileOutputStream(new File("test-"+rdfPath)),"RDF/XML");
+        //exit(0);
+        // ----------------------------------------------------------------------
+
         Model rdfOut = procesarDirectorio(modeloSkos, modeloOwl, docDir);
         //rdfOut.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
         // ------------------------- Se pueden unir los tres modelos en un solo fichero:
-        Model unido = rdfOut.union(modeloSkos);
-        unido = unido.union(modeloOwl);
-        unido.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
+        //Model unido = rdfOut.union(modeloSkos);
+        //unido = unido.union(modeloOwl);
+        rdfOut.write(new FileOutputStream(new File("union-"+rdfPath)),"RDF/XML");
+
+        // Inferencia:
+        InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), rdfOut);
+        // borramos elementos del modelo para facilitar la visualizacion de lo que nos interesa
+        Model model2 = borrarRecursosOWL(rdfOut);
+        model2.write(new FileOutputStream(new File("inf-"+rdfPath)),"RDF/XML");
     }
 
 
@@ -74,6 +89,8 @@ public class SemanticGenerator {
 
     private static Model procesarDirectorio(Model modeloSkos, Model modeloOwl, File dir) {
         Model rdfOut = addConstantes(modeloSkos, modeloOwl);
+        Model unido = rdfOut.union(modeloSkos);
+        rdfOut = unido.union(modeloOwl);
         //Model rdfOut = ModelFactory.createDefaultModel();
         if (dir.canRead()) {
             if (dir.isDirectory()) {
@@ -82,6 +99,8 @@ public class SemanticGenerator {
                 if (files != null) {
                     for (int i = 0; i < files.length; i++) {
                         rdfOut = procesarFichero(modeloSkos, modeloOwl, rdfOut, new File(dir, files[i]));
+                        //if (i>500)
+                            //break; // TODO: BORRAR, DEBUG
                     }
                 }
             } else {
@@ -104,7 +123,6 @@ public class SemanticGenerator {
     }
 
     private static Model procesarFichero(Model modeloSkos, Model modeloOwl, Model rdfOut, File file) {
-
         FileInputStream fis;
         try {
             fis = new FileInputStream(file);
@@ -165,6 +183,8 @@ public class SemanticGenerator {
                 campos.put(nom, vals);
             }
             rdfOut = procesarCampos(modeloSkos, modeloOwl, rdfOut, campos);
+            //System.out.println(campos.get("identifier"));
+            //InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), rdfOut);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -181,7 +201,12 @@ public class SemanticGenerator {
         String uri = uriFromIdentifier(campos.get("identifier").get(0));
         // TODO: {"identifier", "date", "format", "language"} (Strings cortas)
         // TODO : {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
-
+        //if (!campos.get("date").isEmpty()) { // TODO: BORRAR DEBUGGGGGGGGGGG
+        //    return rdfOut;
+            //String date = campos.get("date").get(0);
+            //rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear);
+            //doc.addProperty(modeloOwl.getProperty(raiz + "date"), rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear));
+        //}
         String tipo = parseTipo(campos.get("type").get(0));
         //System.out.println(date);
         Resource doc = rdfOut.createResource(uri)
@@ -244,7 +269,8 @@ public class SemanticGenerator {
         }
         if (!campos.get("date").isEmpty()) {
             String date = campos.get("date").get(0);
-            doc.addProperty(modeloOwl.getProperty(raiz + "date"), date);
+            //rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear);
+            doc.addProperty(modeloOwl.getProperty(raiz + "date"), rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear));
         }
         rdfOut = addConceptos(modeloSkos, modeloOwl, doc, rdfOut, campos);
                 //
@@ -264,7 +290,7 @@ public class SemanticGenerator {
     {
         // TODO : {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
         //Analyzer analyzer = new NuestroSpanishAnalyzer();
-        List<String> clavesTextos = Arrays.asList("title", "contributor", "subject", "description", "creator", "publisher");
+        //List<String> clavesTextos = Arrays.asList("title", "contributor", "subject", "description", "creator", "publisher");
         for (var clave : campos.keySet()) { // para cada lista de textos
             for (String texto : campos.get(clave)) { // para cada texto en el doc de entrada
                 // Tokenizar (obtener palabras o raices):
@@ -296,14 +322,19 @@ public class SemanticGenerator {
     }
     private static List<String> getURIsConcepto(Model modeloSkos, String token) {
         List<String> uris = new ArrayList<>();
+        // PREF LABELS:
         StmtIterator it = modeloSkos.listStatements(null, SKOS.prefLabel, (RDFNode) null);
         while (it.hasNext()) {
             Statement st = it.next();
-
-            if (st.getObject().isLiteral() && st.getLiteral().getLexicalForm().equals(token)) {//
-                //System.out.println(st.getSubject().getURI() + " - "
-                //        + st.getPredicate().getURI() + " - "
-                //        + st.getLiteral().getLexicalForm());
+            if (st.getObject().isLiteral() && st.getLiteral().getLexicalForm().equals(token)) {
+                uris.add(st.getSubject().getURI());
+            }
+        }
+        // ALT LABELS:
+        it = modeloSkos.listStatements(null, SKOS.altLabel, (RDFNode) null);
+        while (it.hasNext()) {
+            Statement st = it.next();
+            if (st.getObject().isLiteral() && st.getLiteral().getLexicalForm().equals(token)) {
                 uris.add(st.getSubject().getURI());
             }
         }
@@ -405,6 +436,25 @@ public class SemanticGenerator {
         int lenIni = "http://zaguan.unizar.es/".length();
         String fin = identifier.substring(lenIni);
         return raiz+fin;
+    }
+
+    /** De la practica 5
+     * borramos las clases del modelo rdfs que se añaden automáticamene al hacer la inferencia
+     * simplemente para facilitar la visualización de la parte que nos interesa
+     * si quieres ver todo lo que genera el motor de inferencia comenta estas lineas
+     */
+    private static Model borrarRecursosOWL(Model inf) {
+        //hacemos una copia del modelo ya que el modelo inferido es inmutable
+        Model model2 = ModelFactory.createDefaultModel();
+        model2.add(inf);
+        model2.removeAll(inf.createResource("http://www.w3.org/2002/07/owl#topDataProperty"), null, (RDFNode)null);
+        model2.removeAll(inf.createResource("http://www.w3.org/2002/07/owl#topObjectProperty"), null, (RDFNode)null);
+        model2.removeAll(inf.createResource("http://www.w3.org/2002/07/owl#Thing"), null, (RDFNode)null);
+        model2.removeAll(inf.createResource("http://www.w3.org/2002/07/owl#bottomObjectProperty"), null, (RDFNode)null);
+        model2.removeAll(inf.createResource("http://www.w3.org/2002/07/owl#Nothing"), null, (RDFNode)null);
+        model2.removeAll(inf.createResource("http://www.w3.org/2002/07/owl#bottomDataProperty"), null, (RDFNode)null);
+
+        return model2;
     }
 
 }

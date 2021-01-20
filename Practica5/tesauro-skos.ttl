@@ -1,185 +1,216 @@
-<rdf:RDF
-    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:j.0="http://www.w3.org/2004/02/skos/core#">
-  <j.0:Concept rdf:about="http://nuestraraiz/relevancia-social">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/social">
-        <j.0:prefLabel xml:lang="en">social</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">social</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel xml:lang="en">social relevance</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">relevancia social</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/ingenieria-biomedica">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/ingenieria">
-        <j.0:prefLabel xml:lang="en">engineering</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">ingenieria</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/biomedicina">
-        <j.0:broader>
-          <j.0:Concept rdf:about="http://nuestraraiz/medicina">
-            <j.0:broader>
-              <j.0:Concept rdf:about="http://nuestraraiz/biologia">
-                <j.0:broader>
-                  <j.0:Concept rdf:about="http://nuestraraiz/ciencia">
-                    <j.0:altLabel xml:lang="en">100cia</j.0:altLabel>
-                    <j.0:prefLabel xml:lang="en">science</j.0:prefLabel>
-                    <j.0:prefLabel xml:lang="es">ciencia</j.0:prefLabel>
-                  </j.0:Concept>
-                </j.0:broader>
-                <j.0:prefLabel xml:lang="en">biology</j.0:prefLabel>
-                <j.0:prefLabel xml:lang="es">biologia</j.0:prefLabel>
-              </j.0:Concept>
-            </j.0:broader>
-            <j.0:prefLabel xml:lang="en">medicine</j.0:prefLabel>
-            <j.0:prefLabel xml:lang="es">medicina</j.0:prefLabel>
-          </j.0:Concept>
-        </j.0:broader>
-        <j.0:broader rdf:resource="http://nuestraraiz/biologia"/>
-        <j.0:prefLabel xml:lang="en">biomedicine</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">biomedicina</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel xml:lang="en">biomedical engineering</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">ingenieria biomedica</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/gobierno">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/politica">
-        <j.0:prefLabel xml:lang="en">politics</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">politica</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel xml:lang="en">government</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">gobierno</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/bioinformatica">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/informatica">
-        <j.0:broader rdf:resource="http://nuestraraiz/ciencia"/>
-        <j.0:prefLabel xml:lang="en">computer science</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">informatica</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:broader rdf:resource="http://nuestraraiz/biologia"/>
-    <j.0:altLabel xml:lang="es">biologia computacional</j.0:altLabel>
-    <j.0:altLabel xml:lang="en">computational biology</j.0:altLabel>
-    <j.0:prefLabel xml:lang="en">bioinformatics</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">bioinformatica</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/evolucion-economica">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/economia">
-        <j.0:prefLabel xml:lang="en">economy</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">economia</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/evolucion">
-        <j.0:prefLabel xml:lang="en">evolution</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">evolucion</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel xml:lang="en">economic evolution</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">evolucion economica</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/filogenetica">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/genetica">
-        <j.0:broader rdf:resource="http://nuestraraiz/biologia"/>
-        <j.0:prefLabel xml:lang="en">genetics</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">genetica</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel xml:lang="en">phylogenetics</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">filogenetica</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/dictadura">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/autoritarismo">
-        <j.0:broader rdf:resource="http://nuestraraiz/politica"/>
-        <j.0:prefLabel xml:lang="en">authoritarianism</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">autoritarismo</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel xml:lang="en">dictatorship</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">dictadura</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/crisis-economica">
-    <j.0:broader rdf:resource="http://nuestraraiz/economia"/>
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/crisis">
-        <j.0:prefLabel xml:lang="en">crisis</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">crisis</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel xml:lang="en">economic crisis</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">crisis economica</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/diagnostico">
-    <j.0:broader rdf:resource="http://nuestraraiz/medicina"/>
-    <j.0:prefLabel xml:lang="en">diagnosis</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">diagnostico</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/parkinson">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/enfermedad-neurodegenerativa">
-        <j.0:broader>
-          <j.0:Concept rdf:about="http://nuestraraiz/neurologia">
-            <j.0:broader rdf:resource="http://nuestraraiz/medicina"/>
-            <j.0:prefLabel xml:lang="en">neurology</j.0:prefLabel>
-            <j.0:prefLabel xml:lang="es">neurologia</j.0:prefLabel>
-          </j.0:Concept>
-        </j.0:broader>
-        <j.0:broader>
-          <j.0:Concept rdf:about="http://nuestraraiz/enfermedad">
-            <j.0:broader rdf:resource="http://nuestraraiz/medicina"/>
-            <j.0:prefLabel xml:lang="en">disease</j.0:prefLabel>
-            <j.0:prefLabel xml:lang="es">enfermedad</j.0:prefLabel>
-          </j.0:Concept>
-        </j.0:broader>
-        <j.0:prefLabel xml:lang="en">neurodegenerative disease</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">enfermedad neurodegenerativa</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel>parkinson</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/partidos-politicos">
-    <j.0:broader rdf:resource="http://nuestraraiz/politica"/>
-    <j.0:prefLabel xml:lang="en">political parties</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">partidos politicos</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/huesca">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/espana">
-        <j.0:prefLabel xml:lang="en">spain</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">españa</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:prefLabel>uesca@fabla</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">huesca</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/alzheimer">
-    <j.0:broader rdf:resource="http://nuestraraiz/enfermedad-neurodegenerativa"/>
-    <j.0:prefLabel>alzheimer</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/caciquismo">
-    <j.0:broader rdf:resource="http://nuestraraiz/autoritarismo"/>
-    <j.0:prefLabel xml:lang="es">caciquismo</j.0:prefLabel>
-  </j.0:Concept>
-  <j.0:Concept rdf:about="http://nuestraraiz/represion-politica">
-    <j.0:broader>
-      <j.0:Concept rdf:about="http://nuestraraiz/represion">
-        <j.0:prefLabel xml:lang="en">repression</j.0:prefLabel>
-        <j.0:prefLabel xml:lang="es">represion</j.0:prefLabel>
-      </j.0:Concept>
-    </j.0:broader>
-    <j.0:broader rdf:resource="http://nuestraraiz/politica"/>
-    <j.0:prefLabel xml:lang="en">political repression</j.0:prefLabel>
-    <j.0:prefLabel xml:lang="es">represion politica</j.0:prefLabel>
-  </j.0:Concept>
-</rdf:RDF>
+<http://nuestraraiz/represion>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "repression"@en , "represion"@es .
+
+<http://nuestraraiz/dictadura>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/autoritarismo> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "dictatorship"@en , "dictadura"@es .
+
+<http://nuestraraiz/economia>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "economy"@en , "economia"@es .
+
+<http://nuestraraiz/autoritarismo>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/politica> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "authoritarianism"@en , "autoritarismo"@es .
+
+<http://nuestraraiz/relevancia-social>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/social> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "social relevance"@en , "relevancia social"@es .
+
+<http://nuestraraiz/informatica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/ciencia> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "computer science"@en , "informatica"@es .
+
+<http://nuestraraiz/crisis>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "crisis"@en , "crisis"@es .
+
+<http://nuestraraiz/filogenetica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/genetica> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "phylogenetics"@en , "filogenetica"@es .
+
+<http://nuestraraiz/evolucion>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "evolution"@en , "evolucion"@es .
+
+<http://nuestraraiz/diagnostico>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/medicina> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "diagnosis"@en , "diagnostico"@es .
+
+<http://nuestraraiz/gobierno>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/politica> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "government"@en , "gobierno"@es .
+
+<http://nuestraraiz/enfermedad>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/medicina> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "disease"@en , "enfermedad"@es .
+
+<http://nuestraraiz/crisis-economica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/economia> , <http://nuestraraiz/crisis> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "economic crisis"@en , "crisis economica"@es .
+
+<http://nuestraraiz/huesca>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/espana> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "uesca@fabla" , "huesca"@es .
+
+<http://nuestraraiz/bioinformatica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#altLabel>
+                "biologia computacional"@es , "computational biology"@en ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/informatica> , <http://nuestraraiz/biologia> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "bioinformatics"@en , "bioinformatica"@es .
+
+<http://nuestraraiz/caciquismo>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/autoritarismo> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "caciquismo"@es .
+
+<http://nuestraraiz/biomedicina>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/medicina> , <http://nuestraraiz/biologia> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "biomedicine"@en , "biomedicina"@es .
+
+<http://nuestraraiz/ingenieria>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "engineering"@en , "ingenieria"@es .
+
+<http://nuestraraiz/biologia>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/ciencia> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "biology"@en , "biologia"@es .
+
+<http://nuestraraiz/alzheimer>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/enfermedad-neurodegenerativa> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "alzheimer" .
+
+<http://nuestraraiz/ingenieria-biomedica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/ingenieria> , <http://nuestraraiz/biomedicina> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "biomedical engineering"@en , "ingenieria biomedica"@es .
+
+<http://nuestraraiz/neurologia>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/medicina> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "neurology"@en , "neurologia"@es .
+
+<http://nuestraraiz/enfermedad-neurodegenerativa>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/neurologia> , <http://nuestraraiz/enfermedad> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "neurodegenerative disease"@en , "enfermedad neurodegenerativa"@es .
+
+<http://nuestraraiz/evolucion-economica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/economia> , <http://nuestraraiz/evolucion> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "economic evolution"@en , "evolucion economica"@es .
+
+<http://nuestraraiz/represion-politica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/represion> , <http://nuestraraiz/politica> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "political repression"@en , "represion politica"@es .
+
+<http://nuestraraiz/parkinson>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/enfermedad-neurodegenerativa> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "parkinson" .
+
+<http://nuestraraiz/medicina>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/biologia> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "medicine"@en , "medicina"@es .
+
+<http://nuestraraiz/espana>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "spain"@en , "españa"@es .
+
+<http://nuestraraiz/politica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "politics"@en , "politica"@es .
+
+<http://nuestraraiz/partidos-politicos>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/politica> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "political parties"@en , "partidos politicos"@es .
+
+<http://nuestraraiz/genetica>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#broader>
+                <http://nuestraraiz/biologia> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "genetics"@en , "genetica"@es .
+
+<http://nuestraraiz/social>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "social"@en , "social"@es .
+
+<http://nuestraraiz/ciencia>
+        a       <http://www.w3.org/2004/02/skos/core#Concept> ;
+        <http://www.w3.org/2004/02/skos/core#altLabel>
+                "100cia"@en ;
+        <http://www.w3.org/2004/02/skos/core#prefLabel>
+                "science"@en , "ciencia"@es .
