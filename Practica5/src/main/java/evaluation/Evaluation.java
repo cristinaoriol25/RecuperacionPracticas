@@ -15,13 +15,10 @@ package evaluation;/*
  * limitations under the License.
  */
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 /** Simple command-line based search demo. */
@@ -60,12 +57,12 @@ public class Evaluation {
       }
     }
     relevancias = parseQRels(qrelsFileN);
-    /*for (var eval : relevancias) {
-      System.out.println(eval);
+    /*for (var eval : relevancias.keySet()) {
+      System.out.println(relevancias.get(eval));
     }*/
     resultados = parseResults(resultsFileN);
-    /*for (var res : resultados) {
-      System.out.println(res);
+    /*for (var res : resultados.keySet()) {
+      System.out.println(resultados.get(res));
     }*/
     Map<String, EvaluacionNeed> evaluaciones = evaluar(relevancias, resultados);
     escribirEvaluaciones(outputFileN, evaluaciones);
@@ -239,9 +236,9 @@ public class Evaluation {
       scan = new Scanner(resultsFile);
       while(scan.hasNext()){
         String linea = scan.nextLine();
-        String[] tokens = linea.split("\t");
+        String[] tokens = linea.split("[\t ]+");
         if (tokens.length<2) {
-          System.out.println("Linea con menos de 2 elementos en fichero " + resultsFileN);
+          System.out.println("Linea con menos de 2 elementos en fichero " + resultsFileN+" los tokens de mierda son: "+tokens[0]);
           System.exit(1);
         }
         /*for (var s : tokens) {
@@ -253,9 +250,10 @@ public class Evaluation {
         if (!resultados.containsKey(need)) {
           resultados.put(need, new ArrayList<String>());
         }
-        String docId = (tokens[1].trim());
+        String docId = (tokens[1]);
         List<String> resNeed = resultados.get(need);
-        if (resNeed.size() < MAX_RES_NEED) { // Solo MAX_RES_NEED por need
+        System.out.println(tokens[0]+" id:  "+docId);
+        if (resNeed.size() < MAX_RES_NEED) { // Solo MAX_RES_NEED por nee
           resNeed.add(docId);
         }
         //documentos.add(new Documento(Integer.parseInt(tokens[0].trim()), Integer.parseInt(tokens[1].trim())));
@@ -301,107 +299,5 @@ public class Evaluation {
     return relevancias;
   }
 
-  /**
-   * This demonstrates a typical paging search scenario, where the search engine presents 
-   * pages of size n to the user. The user can then go to the next page if interested in
-   * the next hits.
-   * 
-   * When the query is executed for the first time, then only enough results are collected
-   * to fill 5 result pages. If the user wants to page beyond this limit, then the query
-   * is executed another time and all hits are collected.
-   * 
-   */
-  public static void doPagingSearch(BufferedReader in, IndexSearcher searcher, Query query, 
-                                     int hitsPerPage, boolean raw, boolean interactive) throws IOException {
- 
-    // Collect enough docs to show 5 pages
-    TopDocs results = searcher.search(query, 5 * hitsPerPage);
-    ScoreDoc[] hits = results.scoreDocs;
-    
-    int numTotalHits = Math.toIntExact(results.totalHits.value);
-    System.out.println(numTotalHits + " total matching documents");
 
-    int start = 0;
-    int end = Math.min(numTotalHits, hitsPerPage);
-
-    while (true) {
-      if (end > hits.length) {
-        System.out.println("Only results 1 - " + hits.length +" of " + numTotalHits + " total matching documents collected.");
-        System.out.println("Collect more (y/n) ?");
-        String line = in.readLine();
-        if (line.length() == 0 || line.charAt(0) == 'n') {
-          break;
-        }
-
-        hits = searcher.search(query, numTotalHits).scoreDocs;
-      }
-      
-      end = Math.min(hits.length, start + hitsPerPage);
-      
-      for (int i = start; i < end; i++) {
-        System.out.println(searcher.explain(query, hits[i].doc));
-        if (raw) {                              // output raw format
-          System.out.println("doc="+hits[i].doc+" score="+hits[i].score);
-          continue;
-        }
-
-        Document doc = searcher.doc(hits[i].doc);
-        String path = doc.get("path");
-        if (path != null) {
-          System.out.println((i+1) + ". " + path);
-        } else {
-          System.out.println((i+1) + ". " + "No path for this document");
-        }
-        if (!raw){
-          Date currentDate = new Date(Long.parseLong(doc.get("modified")));
-          System.out.println(currentDate);
-        }
-                  
-      }
-
-      if (!interactive || end == 0) {
-        break;
-      }
-
-      if (numTotalHits >= end) {
-        boolean quit = false;
-        while (true) {
-          System.out.print("Press ");
-          if (start - hitsPerPage >= 0) {
-            System.out.print("(p)revious page, ");  
-          }
-          if (start + hitsPerPage < numTotalHits) {
-            System.out.print("(n)ext page, ");
-          }
-          System.out.println("(q)uit or enter number to jump to a page.");
-          
-          String line = in.readLine();
-          if (line.length() == 0 || line.charAt(0)=='q') {
-            quit = true;
-            break;
-          }
-          if (line.charAt(0) == 'p') {
-            start = Math.max(0, start - hitsPerPage);
-            break;
-          } else if (line.charAt(0) == 'n') {
-            if (start + hitsPerPage < numTotalHits) {
-              start+=hitsPerPage;
-            }
-            break;
-          } else {
-            int page = Integer.parseInt(line);
-            if ((page - 1) * hitsPerPage < numTotalHits) {
-              start = (page - 1) * hitsPerPage;
-              break;
-            } else {
-              System.out.println("No such page");
-            }
-          }
-        }
-        if (quit) break;
-        end = Math.min(numTotalHits, start + hitsPerPage);
-      }
-
-    }
-  }
 }
