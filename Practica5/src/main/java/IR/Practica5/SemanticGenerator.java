@@ -58,6 +58,7 @@ public class SemanticGenerator {
             System.out.println("Document directory '" + docDir.getAbsolutePath() + "' does not exist or is not readable, please check the path");
             exit(1);
         }
+        System.out.println("A cargar los modelos " + skosPath+ " "+owlPath);
         // cargar skos:
         Model modeloSkos = cargarModelo(skosPath, "TURTLE");
         Model modeloOwl = cargarModelo(owlPath, "TURTLE");
@@ -66,18 +67,18 @@ public class SemanticGenerator {
         //inf2.write(new FileOutputStream(new File("test-"+rdfPath)),"RDF/XML");
         //exit(0);
         // ----------------------------------------------------------------------
-
+        System.out.println("A procesar directorios:");
         Model rdfOut = procesarDirectorio(modeloSkos, modeloOwl, docDir);
         //rdfOut.write(new FileOutputStream(new File(rdfPath)),"RDF/XML");
         // ------------------------- Se pueden unir los tres modelos en un solo fichero:
         //Model unido = rdfOut.union(modeloSkos);
         //unido = unido.union(modeloOwl);
-        rdfOut.write(new FileOutputStream(new File("union-"+rdfPath)),"RDF/XML");
-
+        rdfOut.write(new FileOutputStream(new File("sininf-"+rdfPath)),"RDF/XML");
+        System.out.println("a inferir");
         // Inferencia:
         InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), rdfOut);
         // borramos elementos del modelo para facilitar la visualizacion de lo que nos interesa
-        Model model2 = borrarRecursosOWL(rdfOut);
+        Model model2 = borrarRecursosOWL(inf);
         model2.write(new FileOutputStream(new File("inf-"+rdfPath)),"RDF/XML");
     }
 
@@ -183,8 +184,9 @@ public class SemanticGenerator {
                 campos.put(nom, vals);
             }
             rdfOut = procesarCampos(modeloSkos, modeloOwl, rdfOut, campos);
-            //System.out.println(campos.get("identifier"));
+            //System.out.print(campos.get("identifier"));
             //InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), rdfOut);
+            //System.out.println(" " + inf.toString().charAt(0));
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -211,8 +213,8 @@ public class SemanticGenerator {
         //System.out.println(date);
         Resource doc = rdfOut.createResource(uri)
                 .addProperty(RDF.type, modeloOwl.getResource(tipo))
-                .addProperty(modeloOwl.getProperty(raiz+"Idioma-documento"), rdfOut.getResource(raiz+campos.get("language").get(0)))
-                .addProperty(modeloOwl.getProperty(raiz+"title"), campos.get("title").get(0));
+                .addProperty(modeloOwl.getProperty(raiz+"Idioma-documento"), rdfOut.getResource(raiz+campos.get("language").get(0)));
+                //.addProperty(modeloOwl.getProperty(raiz+"title"), campos.get("title").get(0));
         for (String contributor : campos.get("contributor")) {
             String uriCont = crearUri(contributor);
             String[] nombres = parseNombre(contributor);
@@ -257,20 +259,29 @@ public class SemanticGenerator {
             String uriPublisher = crearUri(publisher);
             //Resource nombreDep = rdfOut.createResource(uriPublisher+"-nombre")
             //        .addProperty(RDF.type, modeloOwl.getResource(raiz+"Nombre-departamento"));
-            Resource publisherRes = rdfOut.createResource(uriPublisher)
-                    .addProperty(modeloOwl.getProperty(raiz+"Nombre-departamento"), publisher);
-            doc.addProperty(modeloOwl.getProperty(raiz+"Departamento"), publisherRes);
+            //Resource departamentoRes = rdfOut.createResource(uriPublisher)
+            //        .addProperty(modeloOwl.getProperty(raiz+"Nombre-departamento"), publisher);
+            //doc.addProperty(modeloOwl.getProperty(raiz+"publisher"), departamentoRes);
         }
         for (String subject : campos.get("subject")) { // Para cada subject
-            doc.addProperty(modeloOwl.getProperty(raiz+"Subject"), subject);
+            //doc.addProperty(modeloOwl.getProperty(raiz+"Subject"), subject);
         }
         for (String description : campos.get("description")) { // Para cada subject
-            doc.addProperty(modeloOwl.getProperty(raiz+"description"), description);
+            //doc.addProperty(modeloOwl.getProperty(raiz+"description"), description);
         }
+        /*
+
+
+        Resource date=model.createProperty(root+"date")
+        Resource title=model.createProperty(root+"title")
+        Resource description=model.createProperty(root+"description")
+        Resource subject=model.createProperty(root+"Subject")
+        Resource nomDepartamento
+         */
         if (!campos.get("date").isEmpty()) {
             String date = campos.get("date").get(0);
             //rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear);
-            doc.addProperty(modeloOwl.getProperty(raiz + "date"), rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear));
+            //doc.addProperty(modeloOwl.getProperty(raiz + "date"), rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear));
         }
         rdfOut = addConceptos(modeloSkos, modeloOwl, doc, rdfOut, campos);
                 //
