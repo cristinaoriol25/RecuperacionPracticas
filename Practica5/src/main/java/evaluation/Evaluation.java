@@ -116,7 +116,11 @@ public class Evaluation {
 
       List<Double[]> prec_recall = puntosPR (relevanciasNeed, recuperadosNeed);
       // La prec y recall son los del ultimo punto:
-      double precision = prec_recall.get(prec_recall.size()-1)[1];//precision(recuperadosNeed, relevanciasNeed);
+      if (prec_recall.size() == 0) {
+        continue;
+      }
+      //double precision = prec_recall.get(prec_recall.size()-1)[1];
+      double precision = precision(recuperadosNeed, relevanciasNeed);
       double recall = prec_recall.get(prec_recall.size()-1)[0];//recall(recuperadosNeed, relevanciasNeed);
       double f1score = 2f * precision * recall / (precision + recall);
 
@@ -130,6 +134,18 @@ public class Evaluation {
     EvaluacionNeed total = new EvaluacionNeed(evaluaciones);
     evaluaciones.put("TOTAL",total);
     return evaluaciones;
+  }
+
+  private static double precision(List<String> recuperadosNeed, Map<String, Boolean> relevanciasNeed) {
+    int positivos = 0; // positivos (pueden ser false o true)
+    int positivosTrue = 0; // true positives
+    for (String recuperado : recuperadosNeed) {
+      positivos++; // recuperado
+      if (relevanciasNeed.get(recuperado)) { // Y relevante
+        positivosTrue++;
+      }
+    }
+    return Double.valueOf(positivosTrue)/Double.valueOf(positivos);
   }
 
   private static List<Double[]> puntosPR(Map<String, Boolean> relevanciasNeed, List<String> recuperadosNeed) {
@@ -238,7 +254,7 @@ public class Evaluation {
         String linea = scan.nextLine();
         String[] tokens = linea.split("[\t ]+");
         if (tokens.length<2) {
-          System.out.println("Linea con menos de 2 elementos en fichero " + resultsFileN+" los tokens de mierda son: "+tokens[0]);
+          System.out.println("Linea con menos de 2 elementos en fichero " + resultsFileN+" los tokens son: "+tokens[0]);
           System.exit(1);
         }
         /*for (var s : tokens) {
