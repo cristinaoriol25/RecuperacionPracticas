@@ -141,7 +141,7 @@ public class Evaluation {
     int positivosTrue = 0; // true positives
     for (String recuperado : recuperadosNeed) {
       positivos++; // recuperado
-      if (relevanciasNeed.get(recuperado)) { // Y relevante
+      if (relevanciasNeed.containsKey(recuperado) && relevanciasNeed.get(recuperado)) { // Y relevante
         positivosTrue++;
       }
     }

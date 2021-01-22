@@ -74,12 +74,12 @@ public class SemanticGenerator {
         //Model unido = rdfOut.union(modeloSkos);
         //unido = unido.union(modeloOwl);
         rdfOut.write(new FileOutputStream(new File("sininf-"+rdfPath)),"RDF/XML");
-        System.out.println("a inferir");
+        //System.out.println("a inferir");
         // Inferencia:
-        InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), rdfOut);
+        //InfModel inf = ModelFactory.createInfModel(PelletReasonerFactory.theInstance().create(), rdfOut);
         // borramos elementos del modelo para facilitar la visualizacion de lo que nos interesa
-        Model model2 = borrarRecursosOWL(inf);
-        model2.write(new FileOutputStream(new File("inf-"+rdfPath)),"RDF/XML");
+        //Model model2 = borrarRecursosOWL(inf);
+        //model2.write(new FileOutputStream(new File("inf-"+rdfPath)),"RDF/XML");
     }
 
 
@@ -201,20 +201,15 @@ public class SemanticGenerator {
     // o estos {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
     private static Model procesarCampos(Model modeloSkos, Model modeloOwl, Model rdfOut, Map<String, List<String>> campos) {
         String uri = uriFromIdentifier(campos.get("identifier").get(0));
-        // TODO: {"identifier", "date", "format", "language"} (Strings cortas)
-        // TODO : {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
-        //if (!campos.get("date").isEmpty()) { // TODO: BORRAR DEBUGGGGGGGGGGG
-        //    return rdfOut;
-            //String date = campos.get("date").get(0);
-            //rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear);
-            //doc.addProperty(modeloOwl.getProperty(raiz + "date"), rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear));
-        //}
+        // Campos {"identifier", "date", "format", "language"} (Strings cortas)
+        // + {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
+
         String tipo = parseTipo(campos.get("type").get(0));
         //System.out.println(date);
         Resource doc = rdfOut.createResource(uri)
                 .addProperty(RDF.type, modeloOwl.getResource(tipo))
-                .addProperty(modeloOwl.getProperty(raiz+"Idioma-documento"), rdfOut.getResource(raiz+campos.get("language").get(0)));
-                //.addProperty(modeloOwl.getProperty(raiz+"title"), campos.get("title").get(0));
+                .addProperty(modeloOwl.getProperty(raiz+"Idioma-documento"), rdfOut.getResource(raiz+campos.get("language").get(0)))
+                .addProperty(modeloOwl.getProperty(raiz+"title"), campos.get("title").get(0));
         for (String contributor : campos.get("contributor")) {
             String uriCont = crearUri(contributor);
             String[] nombres = parseNombre(contributor);
@@ -257,51 +252,32 @@ public class SemanticGenerator {
         }
         for (String publisher : campos.get("publisher")) {
             String uriPublisher = crearUri(publisher);
-            //Resource nombreDep = rdfOut.createResource(uriPublisher+"-nombre")
-            //        .addProperty(RDF.type, modeloOwl.getResource(raiz+"Nombre-departamento"));
-            //Resource departamentoRes = rdfOut.createResource(uriPublisher)
-            //        .addProperty(modeloOwl.getProperty(raiz+"Nombre-departamento"), publisher);
-            //doc.addProperty(modeloOwl.getProperty(raiz+"publisher"), departamentoRes);
+            Resource nombreDep = rdfOut.createResource(uriPublisher+"-nombre")
+                    .addProperty(RDF.type, modeloOwl.getResource(raiz+"Nombre-departamento"));
+            Resource departamentoRes = rdfOut.createResource(uriPublisher)
+                    .addProperty(modeloOwl.getProperty(raiz+"Nombre-departamento"), publisher);
+            doc.addProperty(modeloOwl.getProperty(raiz+"publisher"), departamentoRes);
         }
         for (String subject : campos.get("subject")) { // Para cada subject
-            //doc.addProperty(modeloOwl.getProperty(raiz+"Subject"), subject);
+            doc.addProperty(modeloOwl.getProperty(raiz+"Subject"), subject);
         }
         for (String description : campos.get("description")) { // Para cada subject
-            //doc.addProperty(modeloOwl.getProperty(raiz+"description"), description);
+            doc.addProperty(modeloOwl.getProperty(raiz+"description"), description);
         }
-        /*
 
-
-        Resource date=model.createProperty(root+"date")
-        Resource title=model.createProperty(root+"title")
-        Resource description=model.createProperty(root+"description")
-        Resource subject=model.createProperty(root+"Subject")
-        Resource nomDepartamento
-         */
         if (!campos.get("date").isEmpty()) {
             String date = campos.get("date").get(0);
-            //rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear);
-            //doc.addProperty(modeloOwl.getProperty(raiz + "date"), rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear));
+            rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear);
+            doc.addProperty(modeloOwl.getProperty(raiz + "date"), rdfOut.createTypedLiteral(date, XSDDatatype.XSDgYear));
         }
         rdfOut = addConceptos(modeloSkos, modeloOwl, doc, rdfOut, campos);
-                //
-        //rdfOut = procesarIdioma(modeloOwl, rdfOut, campos.get("language"));
-        /*for (Map.Entry<String, String> entry : campos.entrySet()) {
-            String clave = entry.getKey();
-            String valor = entry.getValue();
-            switch (clave) {
-                case
-            }
-        }*/
+
         return rdfOut;
     }
 
     private static Model addConceptos(Model modeloSkos, Model modeloOwl, Resource doc, Model rdfOut,
                                       Map<String, List<String>> campos)
     {
-        // TODO : {"title", "contributor", "subject", "description", "creator", "publisher"} (Textos)
-        //Analyzer analyzer = new NuestroSpanishAnalyzer();
-        //List<String> clavesTextos = Arrays.asList("title", "contributor", "subject", "description", "creator", "publisher");
         for (var clave : campos.keySet()) { // para cada lista de textos
             for (String texto : campos.get(clave)) { // para cada texto en el doc de entrada
                 // Tokenizar (obtener palabras o raices):
@@ -414,14 +390,6 @@ public class SemanticGenerator {
         return raiz+valor.hashCode();//.replaceAll("[ ]+", "-");
     }
 
-    // private static Model procesarIdioma(Model modeloOwl, Model rdfOut, String language) {
-//        String uri = raiz + language;
-//        var a = rdfOut.getResource()
-//        if (rdfOut.contains(uri)) {
-//            rdfOut.
-//
-//        }
-    //}
 
     private static String parseTipo(String type) {
         String fin ="";

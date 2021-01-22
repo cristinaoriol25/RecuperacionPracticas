@@ -34,11 +34,12 @@ public class EvaluacionNeed {
     private void setInterpolarPR() {
         //this.ptosPRInterpolados = ptosPR; // TODO
         this.ptosPRInterpolados = new ArrayList<>();
+        double EPS = 1e-10;
         //this.ptosPRInterpolados.addAll(ptosPR);
         double step = 0.1; // distancia entre cada recall
         for (int i = 0; i<N_PTOS_INTER; i++) {
             double recPto = i*step; // recall del punto
-            double precPto = precisionInterpolada(recPto); // su precision
+            double precPto = precisionInterpolada(recPto-EPS); // su precision // (-EPS por errores de doubles)
             ptosPRInterpolados.add(new Double[]{recPto, precPto});
         }
     }
@@ -49,9 +50,9 @@ public class EvaluacionNeed {
     */
     private double precisionInterpolada(double recPto) {
         double maxPrec = 0;
-        for (var pto : ptosPR) {
+        for (Double[] pto : ptosPR) {
             if (pto[0] >= recPto && pto[1] > maxPrec) maxPrec = pto[1];
-        }
+        } // max(p(r') pt r'>=r)
         return maxPrec;
     }
 
