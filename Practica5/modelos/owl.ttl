@@ -1,0 +1,150 @@
+<http://nuestraraiz/Idioma>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Idioma natural"@es .
+
+<http://nuestraraiz/title>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Título de un documento"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2000/01/rdf-schema#Literal> .
+
+<http://nuestraraiz/contribuido>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Un contributor ha contribuido en la creacion de un documento."@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://nuestraraiz/Contributor> .
+
+<http://nuestraraiz/creado>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Un creador ha creado un documento"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://nuestraraiz/Creator> .
+
+<http://nuestraraiz/Idioma-documento>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Idioma de un documento"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://nuestraraiz/Idioma> .
+
+<http://nuestraraiz/TFC>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Trabajo de fin de carrera, nombre antiguo de TFG"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2002/07/owl#disjointWith>
+                <http://nuestraraiz/TFM> , <http://nuestraraiz/TFG> , <http://nuestraraiz/Tesis> .
+
+<http://nuestraraiz/Creator>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Creador de un trabajo"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://xmlns.com/foaf/0.1/Person> .
+
+<http://nuestraraiz/Subject>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Tema de un documento definido según el propio documento (rango literal)"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2000/01/rdf-schema#Literal> .
+
+<http://nuestraraiz/Documento>
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Documento de un trabajo académico de Zaguán"@es .
+
+<http://nuestraraiz/Tema>
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Tema de un documento (rango conceptos de skos:concept)"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2004/02/skos/core#Concept> .
+
+<http://nuestraraiz/Nombre-departamento>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Nombre de un departamento de la universidad"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Departamento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2000/01/rdf-schema#Literal> .
+
+<http://nuestraraiz/TFG>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Trabajo de fin de grado"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2002/07/owl#disjointWith>
+                <http://nuestraraiz/Tesis> .
+
+<http://nuestraraiz/publisher>
+        a       <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Departamento de universidad que publica el documento"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://nuestraraiz/Departamento> .
+
+<http://nuestraraiz/TFM>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Trabajo de fin de master"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2002/07/owl#disjointWith>
+                <http://nuestraraiz/TFG> , <http://nuestraraiz/Tesis> .
+
+<http://nuestraraiz/date>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Fecha. Concretamente año."@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2001/XMLSchema#gYear> .
+
+<http://nuestraraiz/Tesis>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Trabajo de tipo tesis"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://nuestraraiz/Documento> .
+
+<http://nuestraraiz/Contributor>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Contribuyente a un trabajo (generalmente un profesor)"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#subClassOf>
+                <http://xmlns.com/foaf/0.1/Person> .
+
+<http://nuestraraiz/description>
+        a       <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Descripción de un documento"@es ;
+        <http://www.w3.org/2000/01/rdf-schema#domain>
+                <http://nuestraraiz/Documento> ;
+        <http://www.w3.org/2000/01/rdf-schema#range>
+                <http://www.w3.org/2000/01/rdf-schema#Literal> .
+
+<http://nuestraraiz/Departamento>
+        a       <http://www.w3.org/2002/07/owl#Class> ;
+        <http://www.w3.org/2000/01/rdf-schema#comment>
+                "Departamento de universidad"@es .
