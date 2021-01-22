@@ -72,7 +72,7 @@ public class SemanticSearcher {
         Dataset ds = TextDatasetFactory.createLucene(ds1, dir, config) ;
 
         // cargamos el fichero deseado y lo almacenamos en el repositorio indexado
-        RDFDataMgr.read(ds.getDefaultModel(), "/home/cris/Escritorio/Universidad/RecuperacionPracticas/Practica5/inf-salidardf.xml") ;
+        RDFDataMgr.read(ds.getDefaultModel(), rdfPath) ;
 
         BufferedReader in = null;
         FileWriter myWriter = new FileWriter(outputPath);
